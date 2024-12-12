@@ -1,0 +1,15 @@
+{% extends "index.html" %}
+{% block title %}Edit Game{% endblock %}
+{% block content %}
+<div class="form-container">
+    <h2>Edit Game</h2>
+    <form action="/edit_game/{{ game.id }}" method="post" enctype="multipart/form-data">
+        <input type="text" name="name" value="{{ game.name }}" required>
+        <input type="text" name="genre" value="{{ game.genre }}" required>
+        <input type="file" name="image_file" accept="image/*">
+        <textarea name="description" required>{{ game.description }}</textarea>
+        <input type="url" name="download_url" value="{{ game.download_url }}" required>
+        <button type="submit">Update Game</button>
+    </form>
+</div>
+{% endblock %}

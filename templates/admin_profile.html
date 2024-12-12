@@ -1,0 +1,24 @@
+{% extends "index.html" %}
+{% block title %}Admin Profile{% endblock %}
+{% block content %}
+<div class="admin-profile-container">
+    <img src="{{ admin.profile_picture }}" alt="Admin Picture">
+    <div class="admin-info">
+        <h2>{{ admin.username }}</h2>
+        <p>{{ admin.bio }}</p>
+        <a href="/edit_admin_profile" class="btn-edit">Edit Profile</a>
+    </div>
+</div>
+
+<div class="admin-news-section">
+    <h3>Recently Added Games</h3>
+    <ul>
+        {% for game in recent_games %}
+        <li>
+            <strong>{{ game.name }}</strong> - {{ game.genre }}
+            <a href="/edit_game/{{ game.id }}" class="btn-manage">Edit</a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

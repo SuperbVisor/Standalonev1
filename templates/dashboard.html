@@ -1,0 +1,28 @@
+{% extends "index.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h2>Game Dashboard</h2>
+
+<!-- Form Search -->
+<form action="/search" method="get" class="search-form">
+    <input type="text" name="query" placeholder="Search games by name or genre..." required>
+    <button type="submit">Search</button>
+</form>
+
+<!-- Game List -->
+<div class="game-list">
+    {% if games %}
+        {% for game in games %}
+        <div class="game-card">
+            <img src="{{ game.image_url }}" alt="{{ game.name }}">
+            <h3>{{ game.name }}</h3>
+            <p>{{ game.description }}</p>
+            <p><strong>Genre:</strong> {{ game.genre }}</p>
+            <a href="{{ game.download_url }}" class="btn">Download</a>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>No games found. Try searching for something else!</p>
+    {% endif %}
+</div>
+{% endblock %}

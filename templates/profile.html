@@ -1,0 +1,17 @@
+{% extends "index.html" %}
+{% block title %}User Profile{% endblock %}
+{% block content %}
+<div class="profile-container">
+    <img src="{{ user.profile_picture }}" alt="User Picture">
+    <h2>{{ user.username }}</h2>
+    <p>{{ user.bio }}</p>
+    <a href="/edit_profile" class="btn-edit">Edit Profile</a>
+
+    <h3>Your Favorite Games</h3>
+    <ul>
+        {% for game in favorite_games %}
+        <li>{{ game.name }} - {{ game.genre }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

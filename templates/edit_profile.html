@@ -1,0 +1,15 @@
+{% extends "index.html" %}
+
+{% block title %}Edit Profil{% endblock %}
+
+{% block content %}
+  <div class="form-container">
+    <h2>Edit Profil</h2>
+    <form action="/edit_profile" method="post" enctype="multipart/form-data">
+      <input type="text" name="username" value="{{ user.username }}" required>
+      <textarea name="bio" required>{{ user.bio }}</textarea>
+      <input type="file" name="profile_picture" accept="image/*">
+      <button type="submit">Simpan Perubahan</button>
+    </form>
+  </div>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "index.html" %}
+{% block title %}Add Game{% endblock %}
+{% block content %}
+<div class="form-container">
+    <h2>Add New Game</h2>
+    <form action="/add_game" method="post" enctype="multipart/form-data">
+        <input type="text" name="name" placeholder="Game Name" required>
+        <input type="text" name="genre" placeholder="Genre" required>
+        <input type="file" name="image_file" accept="image/*" required>
+        <textarea name="description" placeholder="Description" required></textarea>
+        <input type="url" name="download_url" placeholder="Download URL" required>
+        <button type="submit">Add Game</button>
+    </form>
+</div>
+{% endblock %}

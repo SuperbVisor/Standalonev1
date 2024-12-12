@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Game Store{% endblock %}</title>
+    <link rel="icon" href="{{ url_for('static', filename='img/icon_web.png') }}" type="image/png">
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <nav>
+        <h1>Game Store Free</h1>
+        <ul>
+            <li><a href="/">Home</a></li>
+            {% if not session.user_id and not session.admin_id %}
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Register</a></li>
+            {% else %}
+                <li><a href="/profile">Profile</a></li>
+                {% if session.admin_id %}
+                    <li><a href="/add_game">Add Game</a></li>
+                {% endif %}
+                <li><a class="logout" href="/logout">Logout</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>
