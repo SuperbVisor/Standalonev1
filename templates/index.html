@@ -6,6 +6,15 @@
     <title>{% block title %}Game Store{% endblock %}</title>
     <link rel="icon" href="{{ url_for('static', filename='img/icon_web.png') }}" type="image/png">
     <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        body {
+            background-image: url("{{ url_for('static', filename='img/bg.jpg') }}");
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
 </head>
 <body>
     <nav>
