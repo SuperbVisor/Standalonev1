@@ -130,14 +130,6 @@ def callback():
 
     return redirect(url_for('index'))
 
-    # Step 4: Log in the user
-    session['user_id'] = user.id
-    session['username'] = user.username
-    app.logger.info(f"User logged in. Session: {session}")
-    flash('Logged in successfully via Google', 'success')
-
-    return redirect(url_for('index'))
-
 @app.route('/')
 def index():
     print("Session:", session)  # Debug: Print session contents
