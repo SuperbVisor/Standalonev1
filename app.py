@@ -86,7 +86,7 @@ def google_login():
     return redirect(authorization_url)
 
 
-@app.route('/login/google/callback')
+@app.route('/callback')
 def callback():
     # Step 1: Complete the Google authentication flow
     flow.fetch_token(authorization_response=request.url)
