@@ -95,24 +95,25 @@
         {% if session.get('admin_id') %}
             <h1>Hi Mas Admin, Welcome Back</h1>
         {% elif session.get('user_id') %}
-            <h1>Hello Game Loverss.</h1>
+            <h1>Hello {{ user.username }}</h1>
         {% else %}
             <h1>LJS Game Center</h1>
         {% endif %}
         <ul>
             <li><a href="/">Dashboard</a></li>
             {% if not session.user_id and not session.admin_id %}
-                <li><a href="/login">Login</a></li>
-                <li><a href="/register">Register</a></li>
-            {% else %}
-                <li><a href="/profile">Profile</a></li>
-                {% if session.admin_id %}
-                    <li><a href="/add_game">Add Game</a></li>
-                {% endif %}
-                <li><a class="logout" href="/logout">Logout</a></li>
+            <li><a href="/login">Login</a></li>
+            <li><a href="/register">Register</a></li>
+        {% else %}
+            <li><a href="/profile">Profile</a></li>
+            {% if session.admin_id %}
+                <li><a href="/add_game">Add Game</a></li>
             {% endif %}
-        </ul>
-    </nav>
+            <li><a class="logout" href="/logout">Logout</a></li>
+        {% endif %}
+        <li><a href="/404">404 test</a></li>
+    </ul>
+</nav>
     
     <div class="content">
         {% block content %}{% endblock %}

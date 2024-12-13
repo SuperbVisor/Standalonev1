@@ -15,20 +15,25 @@ db = SQLAlchemy(app)
 
 # Folder untuk menyimpan file yang diunggah
 UPLOAD_FOLDER = 'static/uploads'
+PROFILE_PIC_FOLDER = 'static/uploads/pp'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['PROFILE_PIC_FOLDER'] = PROFILE_PIC_FOLDER
 
+# Ensure both folders exist
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(PROFILE_PIC_FOLDER, exist_ok=True)
 # Fungsi untuk memeriksa ekstensi file
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Database Models
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
-    profile_pic = db.Column(db.String(120), default='default.png')  # Changed from profile_picture to profile_pic
+    profile_pic = db.Column(db.String(120), default='default.png')
     bio = db.Column(db.String(255), default='')
 
 class Admin(db.Model):
@@ -58,22 +63,29 @@ with app.app_context():
     setup_admin()
 
 # Routes
+@app.route('/404')
+def error_404():
+    return render_template('404.html'), 404
+
 @app.route('/')
 def index():
     if 'user_id' in session or 'admin_id' in session:
         games = Game.query.all()
-        return render_template('dashboard.html', games=games)
+        if 'user_id' in session:
+            user = User.query.get(session['user_id'])
+        else:
+            user = Admin.query.get(session['admin_id'])
+        return render_template('dashboard.html', user=user, games=games)
     else:
         # Get stats for the landing page
-        visitor_count = User.query.count()  # This is a simple count of registered users
-        user_count = User.query.count()  # Same as visitor_count in this case
+        visitor_count = User.query.count()
+        user_count = User.query.count()
         online_users = 0  # You'll need to implement a way to track online users
 
         return render_template('landing.html', 
                                visitor_count=visitor_count, 
                                user_count=user_count, 
-                               online_users=online_users,
-                               )
+                               online_users=online_users)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -102,20 +114,38 @@ def login():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
+        email = request.form['email']
         username = request.form['username']
         password = request.form['password']
+        confirm_password = request.form['confirm_password']
+        
+        # Check if the passwords match
+        if password != confirm_password:
+            flash('Passwords do not match. Please try again.', 'error')
+            return redirect(url_for('register'))
 
-        if User.query.filter_by(username=username).first():
-            flash('Username already exists', 'error')
-        else:
-            hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-            new_user = User(username=username, password=hashed_password)
-            db.session.add(new_user)
-            db.session.commit()
-            flash('Registration successful', 'success')
-            return redirect(url_for('login'))
+        # Check if the username is 'admin123'
+        if username.lower() == 'admin123':
+            flash('This username is reserved. Please choose a different username.', 'error')
+            return redirect(url_for('register'))
+
+        # Check if the email or username already exists
+        existing_user = User.query.filter((User.email == email) | (User.username == username)).first()
+        if existing_user:
+            flash('Email or username already exists. Please choose different credentials.', 'error')
+            return redirect(url_for('register'))
+
+        # If all checks pass, proceed with registration
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+        new_user = User(email=email, username=username, password=hashed_password)
+        db.session.add(new_user)
+        db.session.commit()
+
+        flash('Registration successful! Please log in.', 'success')
+        return redirect(url_for('login'))
 
     return render_template('register.html')
+
 
 @app.route('/logout')
 def logout():
@@ -134,7 +164,7 @@ def profile():
                 file = request.files['profile_pic']
                 if file and allowed_file(file.filename):
                     filename = secure_filename(file.filename)
-                    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                    file_path = os.path.join(app.config['PROFILE_PIC_FOLDER'], filename)
                     file.save(file_path)
                     user.profile_pic = filename
             
@@ -151,6 +181,32 @@ def profile():
     
     return redirect(url_for('login'))
 
+@app.route('/delete_account', methods=['POST'])
+def delete_account():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    user = User.query.get(session['user_id'])
+    if not user:
+        flash('User not found', 'error')
+        return redirect(url_for('profile'))
+
+    # Delete the user's profile picture if it exists
+    if user.profile_pic and user.profile_pic != 'default.png':
+        try:
+            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], user.profile_pic))
+        except Exception as e:
+            print(f"Error deleting profile picture: {e}")
+
+    # Delete the user from the database
+    db.session.delete(user)
+    db.session.commit()
+
+    # Clear the session
+    session.clear()
+
+    flash('Your account has been successfully deleted.', 'success')
+    return redirect(url_for('index'))
 
 @app.route('/add_game', methods=['GET', 'POST'])
 def add_game():

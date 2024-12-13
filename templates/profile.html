@@ -100,6 +100,52 @@
         margin-top: 5px;
         font-style: italic;
     }
+    .btn-delete {
+        display: block;
+        width: 100%;
+        padding: 0.75rem;
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin-top: 1rem;
+    }
+
+    .btn-delete:hover {
+        background-color: #c82333;
+    }
+    .file-input-wrapper {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+}
+
+.file-input {
+    position: absolute;
+    font-size: 100px;
+    right: 0;
+    top: 0;
+    opacity: 0;
+}
+
+.file-input-label {
+    display: inline-block;
+    padding: 8px 20px;
+    background-color: #4b4b4b;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.file-input-label:hover {
+    background-color: #cfcfcf;
+}
+
 </style>
 
 <div class="profile-container">
@@ -107,15 +153,14 @@
     <form action="{{ url_for('profile') }}" method="POST" enctype="multipart/form-data">
         <div class="form-group">
             {% if user.profile_pic %}
-                <img src="{{ url_for('static', filename='uploads/' + user.profile_pic) }}" alt="Profile Picture" class="profile-picture">
+                <img src="{{ url_for('static', filename='uploads/pp/' + user.profile_pic) }}" alt="Profile Picture" class="profile-picture">
             {% else %}
-                <img src="{{ url_for('uploads', filename='default.jpg') }}" alt="Default Profile Picture" class="profile-picture">
+                <img src="{{ url_for('static', filename='img/default.png') }}" alt="Default Profile Picture" class="profile-picture">
             {% endif %}
-            <label for="profile_pic" class="custom-file-upload">
-                Choose Profile Picture
-            </label>
-            <input type="file" id="profile_pic" name="profile_pic" accept="image/*" onchange="updateFileName(this)">
-            <div id="file-name-display"></div>
+            <div class="file-input-wrapper">
+                <input type="file" id="profile_pic" name="profile_pic" accept="image/*" class="file-input">
+                <label for="profile_pic" class="file-input-label">Change Profile Picture</label>
+            </div>
         </div>
         <div class="form-group">
             <label for="username">Username:</label>
@@ -126,6 +171,9 @@
             <textarea id="bio" name="bio" rows="4">{{ user.bio }}</textarea>
         </div>
         <button type="submit" class="btn-update">Update Profile</button>
+    </form>
+    <form action="{{ url_for('delete_account') }}" method="POST" onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.');">
+        <button type="submit" class="btn-delete">Delete Account</button>
     </form>
 </div>
 {% endblock %}
