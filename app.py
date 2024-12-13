@@ -18,7 +18,7 @@ GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configura
 flow = Flow.from_client_secrets_file(
     'client_secrets.json',
     scopes=['openid', 'email', 'profile'],
-    redirect_uri='http://localhost:5000/callback'
+    redirect_uri='http://127.0.0.1:5000/login/google/callback'
 )
 
 app = Flask(__name__)
