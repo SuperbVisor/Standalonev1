@@ -18,7 +18,7 @@ GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configura
 flow = Flow.from_client_secrets_file(
     'client_secrets.json',
     scopes=['openid', 'email', 'profile'],
-    redirect_uri='https://gamestorefree-edczbmc0e5hdb9en.southeastasia-01.azurewebsites.net/callback'
+    redirect_uri='https://gamestorefree-edczbmc0e5hdb9en.southeastasia-01.azurewebsites.net/login/google/callback'
 )
 
 app = Flask(__name__)
@@ -86,15 +86,8 @@ def google_login():
     return redirect(authorization_url)
 
 
-@app.route('/callback')
 @app.route('/login/google/callback')
 def callback():
-    # Update the redirect_uri based on the actual route used
-    if request.path == '/login/google/callback':
-        flow.redirect_uri = 'https://gamestorefree-edczbmc0e5hdb9en.southeastasia-01.azurewebsites.net/login/google/callback'
-    else:
-        flow.redirect_uri = 'https://gamestorefree-edczbmc0e5hdb9en.southeastasia-01.azurewebsites.net/callback'
-
         flow.fetch_token(authorization_response=request.url)
         if not session.get('state') == request.args.get('state'):
             raise ValueError("Invalid state parameter")
