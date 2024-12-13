@@ -130,11 +130,6 @@ def callback():
 
     return redirect(url_for('index'))
 
-
-@app.route('/404')
-def error_404():
-    return render_template('404.html'), 404
-
 @app.route('/')
 def index():
     print("Session:", session)  # Debug: Print session contents
@@ -361,6 +356,9 @@ def search():
     
     return render_template('dashboard.html', games=results)
 
+@app.route('/404')
+def error_404():
+    return render_template('404.html'), 404
 
 if __name__ == '__main__':
     app.run(debug=True)
