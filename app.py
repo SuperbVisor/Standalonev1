@@ -18,7 +18,7 @@ GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configura
 flow = Flow.from_client_secrets_file(
     'client_secrets.json',
     scopes=['openid', 'email', 'profile'],
-    redirect_uri='https://gamestorefree-edczbmc0e5hdb9en.southeastasia-01.azurewebsites.net/login/google/callback'
+    redirect_uri='https://gamestorefree-edczbmc0e5hdb9en.southeastasia-01.azurewebsites.net/callback'
 )
 
 app = Flask(__name__)
@@ -86,18 +86,16 @@ def google_login():
     return redirect(authorization_url)
 
 
-@app.route('/login/google/callback')
-def google_callback():
-    # Lengkapi token dari Google
+@app.route('/callback')
+def callback():
+    # Step 1: Complete the Google authentication flow
     flow.fetch_token(authorization_response=request.url)
-    
-    # Periksa apakah state yang diterima sama dengan state yang disimpan di session
     if not session.get('state') == request.args.get('state'):
         app.logger.error("Invalid state parameter")
         flash("Invalid state parameter. Login failed.", "error")
         return redirect(url_for('login'))
 
-    # Mendapatkan informasi pengguna dari Google
+    # Step 2: Get user info from Google
     credentials = flow.credentials
     headers = {'Authorization': f'Bearer {credentials.token}'}
     response = requests.get('https://www.googleapis.com/oauth2/v3/userinfo', headers=headers)
@@ -110,7 +108,7 @@ def google_callback():
     userinfo = response.json()
     app.logger.info(f"Received user info from Google: {userinfo}")
 
-    # Cek apakah pengguna sudah ada di database
+    # Step 3: Check if user exists in your database, if not, create a new user
     user = User.query.filter_by(email=userinfo['email']).first()
     if not user:
         app.logger.info(f"Creating new user with email: {userinfo['email']}")
@@ -124,10 +122,18 @@ def google_callback():
     else:
         app.logger.info(f"Existing user found with email: {userinfo['email']}")
 
-    # Login pengguna
+    # Step 4: Log in the user
     session['user_id'] = user.id
     session['username'] = user.username
-    app.logger.info(f"User  logged in. Session: {session}")
+    app.logger.info(f"User logged in. Session: {session}")
+    flash('Logged in successfully via Google', 'success')
+
+    return redirect(url_for('index'))
+
+    # Step 4: Log in the user
+    session['user_id'] = user.id
+    session['username'] = user.username
+    app.logger.info(f"User logged in. Session: {session}")
     flash('Logged in successfully via Google', 'success')
 
     return redirect(url_for('index'))
