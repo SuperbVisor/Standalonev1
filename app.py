@@ -79,6 +79,54 @@ with app.app_context():
     setup_admin()
 
 # Routes
+@app.route('/')
+def index():
+    print("Session:", session)  # Debug: Print session contents
+    if 'user_id' in session or 'admin_id' in session:
+        games = Game.query.all()
+        if 'user_id' in session:
+            user = User.query.get(session['user_id'])
+            print("User:", user)  # Debug: Print user object
+        else:
+            user = Admin.query.get(session['admin_id'])
+            print("Admin:", user)  # Debug: Print admin object
+        return render_template('dashboard.html', user=user, games=games)
+    else:
+        # Get stats for the landing page
+        visitor_count = User.query.count()
+        user_count = User.query.count()
+        online_users = 0  # You'll need to implement a way to track online users
+
+        return render_template('landing.html', 
+                               visitor_count=visitor_count, 
+                               user_count=user_count, 
+                               online_users=online_users)
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        # Check User Login
+        user = User.query.filter_by(username=username).first()
+        if user and check_password_hash(user.password, password):
+            session['user_id'] = user.id
+            session['username'] = user.username  # Add this line
+            return redirect(url_for('index'))
+
+        # Check Admin Login
+        admin = Admin.query.filter_by(username=username).first()
+        if admin and check_password_hash(admin.password, password):
+            session['admin_id'] = admin.id
+            session['username'] = admin.username  # Add this line
+            return redirect(url_for('index'))
+
+        flash('Invalid username or password', 'error')
+
+    return render_template('login.html')
+
 @app.route('/google-login')
 def google_login():
     authorization_url, state = flow.authorization_url()
@@ -129,54 +177,6 @@ def callback():
     flash('Logged in successfully via Google', 'success')
 
     return redirect(url_for('index'))
-
-@app.route('/')
-def index():
-    print("Session:", session)  # Debug: Print session contents
-    if 'user_id' in session or 'admin_id' in session:
-        games = Game.query.all()
-        if 'user_id' in session:
-            user = User.query.get(session['user_id'])
-            print("User:", user)  # Debug: Print user object
-        else:
-            user = Admin.query.get(session['admin_id'])
-            print("Admin:", user)  # Debug: Print admin object
-        return render_template('dashboard.html', user=user, games=games)
-    else:
-        # Get stats for the landing page
-        visitor_count = User.query.count()
-        user_count = User.query.count()
-        online_users = 0  # You'll need to implement a way to track online users
-
-        return render_template('landing.html', 
-                               visitor_count=visitor_count, 
-                               user_count=user_count, 
-                               online_users=online_users)
-
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-
-        # Check User Login
-        user = User.query.filter_by(username=username).first()
-        if user and check_password_hash(user.password, password):
-            session['user_id'] = user.id
-            session['username'] = user.username  # Add this line
-            return redirect(url_for('index'))
-
-        # Check Admin Login
-        admin = Admin.query.filter_by(username=username).first()
-        if admin and check_password_hash(admin.password, password):
-            session['admin_id'] = admin.id
-            session['username'] = admin.username  # Add this line
-            return redirect(url_for('index'))
-
-        flash('Invalid username or password', 'error')
-
-    return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -359,6 +359,6 @@ def search():
 @app.route('/404')
 def error_404():
     return render_template('404.html'), 404
-    
+
 if __name__ == '__main__':
     app.run(debug=True)
