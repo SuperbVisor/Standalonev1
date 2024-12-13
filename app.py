@@ -85,7 +85,8 @@ def google_login():
     session['state'] = state
     return redirect(authorization_url)
 
-@app.route('/callback')
+
+@app.route('/login/google/callback')
 def callback():
     flow.fetch_token(authorization_response=request.url)
 
@@ -109,6 +110,7 @@ def callback():
                     password=bcrypt.generate_password_hash('google_auth').decode('utf-8'))
         db.session.add(user)
         db.session.commit()
+        
 
     # Log in the user
     session['user_id'] = user.id
@@ -116,6 +118,7 @@ def callback():
     print("After Google login, session:", session)  # Debug: Print session after setting
     flash('Logged in successfully via Google', 'success')
     return redirect(url_for('index'))  # This will redirect to the dashboard
+
 
 
 
