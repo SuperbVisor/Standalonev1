@@ -88,36 +88,44 @@ def google_login():
 
 @app.route('/login/google/callback')
 def callback():
-    flow.fetch_token(authorization_response=request.url)
+    try:
+        flow.fetch_token(authorization_response=request.url)
 
-    if not session['state'] == request.args['state']:
-        abort(500)  # State does not match!
+        if not session.get('state') == request.args.get('state'):
+            app.logger.error("State mismatch in Google callback")
+            abort(500)  # State does not match!
 
-    credentials = flow.credentials
-    request_session = requests.session()
-    token_request = requests.Request().prepare()
+        credentials = flow.credentials
+        request_session = requests.session()
+        token_request = requests.Request().prepare()
 
-    token_request.headers['Authorization'] = f'Bearer {credentials.token}'
-    token_request.url = 'https://www.googleapis.com/oauth2/v3/userinfo'
-    response = request_session.send(token_request)
-    userinfo = response.json()
+        token_request.headers['Authorization'] = f'Bearer {credentials.token}'
+        token_request.url = 'https://www.googleapis.com/oauth2/v3/userinfo'
+        response = request_session.send(token_request)
+        response.raise_for_status()  # Raise an error for bad responses
+        userinfo = response.json()
 
-    # Check if user exists, if not, create a new user
-    user = User.query.filter_by(email=userinfo['email']).first()
-    if not user:
-        user = User(email=userinfo['email'], 
-                    username=userinfo['name'], 
-                    password=bcrypt.generate_password_hash('google_auth').decode('utf-8'))
-        db.session.add(user)
-        db.session.commit()
-        
+        # Check if user exists, if not, create a new user
+        user = User.query.filter_by(email=userinfo['email']).first()
+        if not user:
+            user = User(email=userinfo['email'], 
+                        username=userinfo.get('name', 'Google User'),  # Fallback if name is not provided
+                        password=bcrypt.generate_password_hash('google_auth').decode('utf-8'))
+            db.session.add(user)
+            db.session.commit()
 
-    # Log in the user
-    session['user_id'] = user.id
-    session['username'] = user.username
-    print("After Google login, session:", session)  # Debug: Print session after setting
-    flash('Logged in successfully via Google', 'success')
-    return redirect(url_for('index'))  # This will redirect to the dashboard
+        # Log in the user
+        session['user_id'] = user.id
+        session['username'] = user.username
+        app.logger.info(f"After Google login, session: {session}")
+        flash('Logged in successfully via Google', 'success')
+        return redirect(url_for('index'))
+
+    except Exception as e:
+        app.logger.error(f"Error in Google callback: {str(e)}")
+        flash('An error occurred during Google login. Please try again.', 'error')
+        return redirect(url_for('login'))
+
 
 
 
