@@ -1,6 +1,9 @@
 {% extends "index.html" %}
 {% block title %}Register{% endblock %}
 {% block content %}
+<div class="logo-container">
+    <img src="{{ url_for('static', filename='img/ljs.png') }}" alt="LJS Game Center Logo" class="logo-image">
+</div>
 <div class="form-container">
     <h2>Register</h2>
     <form action="/register" method="post">

@@ -22,7 +22,6 @@ body {
 
 /* Navbar */
 nav {
-    background-color: #007bff;
     color: white;
     padding: 10px 20px;
     display: flex;
@@ -72,7 +71,7 @@ nav ul li a.logout:hover {
 
 /* Form Container */
 .form-container {
-    background: white;
+    backdrop-filter: blur(10px);
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
@@ -84,6 +83,7 @@ nav ul li a.logout:hover {
 .form-container h2 {
     text-align: center;
     margin-bottom: 20px;
+    color: #ffffff;
 }
 
 .form-container input,
@@ -98,7 +98,7 @@ nav ul li a.logout:hover {
 }
 
 .form-container button {
-    background-color: #007bff;
+    background-color: #6c8299;
     color: white;
     border: none;
     cursor: pointer;
@@ -106,7 +106,7 @@ nav ul li a.logout:hover {
 }
 
 .form-container button:hover {
-    background-color: #0056b3;
+    background-color: #313131;
 }
 
 /* Game Card */
@@ -118,7 +118,9 @@ nav ul li a.logout:hover {
 }
 
 .game-card {
-    background: white;
+    background-color: rgba(255, 255, 255, 0.1); /* Light white background */
+    backdrop-filter: blur(10px); /* Blur effect */
+    -webkit-backdrop-filter: blur(10px);
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     overflow: hidden;
@@ -139,18 +141,19 @@ nav ul li a.logout:hover {
 .game-card h3 {
     margin: 15px;
     font-size: 1.2em;
+    color: #eeeeee;
 }
 
 .game-card p {
     margin: 15px;
     font-size: 0.9em;
-    color: #555;
+    color: #ffffff;
 }
 
 .game-card .btn {
     display: block;
     text-align: center;
-    background-color: #007bff;
+    background-color: #6c8299;
     color: white;
     padding: 10px;
     text-decoration: none;
@@ -160,7 +163,7 @@ nav ul li a.logout:hover {
 }
 
 .game-card .btn:hover {
-    background-color: #0056b3;
+    background-color: #303030;
 }
 
 /* Search Form */
@@ -179,7 +182,7 @@ nav ul li a.logout:hover {
 
 .search-form button {
     padding: 10px 20px;
-    background-color: #007bff;
+    background-color: #6c8299;
     color: white;
     border: none;
     border-radius: 5px;
@@ -188,12 +191,12 @@ nav ul li a.logout:hover {
 }
 
 .search-form button:hover {
-    background-color: #0056b3;
+    background-color: #282c30;
 }
 
 /* Profile Page Container */
 .profile-container {
-    background: white;
+    
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -204,6 +207,7 @@ nav ul li a.logout:hover {
     flex-direction: column;
     align-items: center;
     gap: 20px;
+    backdrop-filter: blur(10px);
 }
 
 .profile-container img {
@@ -211,19 +215,19 @@ nav ul li a.logout:hover {
     height: 120px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid #007bff;
+    border: 3px solid #6c8299;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .profile-container h2 {
     font-size: 1.8em;
-    color: #333;
+    color: #ffffff;
     margin-bottom: 10px;
 }
 
 .profile-container p {
     font-size: 1em;
-    color: #666;
+    color: #ffffff;
     text-align: center;
     margin-bottom: 10px;
     max-width: 500px;
@@ -232,7 +236,7 @@ nav ul li a.logout:hover {
 /* Edit Profile Button */
 .profile-container .btn-edit {
     padding: 10px 20px;
-    background-color: #007bff;
+    background-color: #6c8299;
     color: white;
     text-decoration: none;
     border-radius: 5px;
@@ -241,12 +245,12 @@ nav ul li a.logout:hover {
 }
 
 .profile-container .btn-edit:hover {
-    background-color: #0056b3;
+    background-color: #303030;
 }
 
 /* Admin Profile Section */
 .admin-profile-container {
-    background: #f8f9fa;
+    backdrop-filter: blur(10px);
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -257,6 +261,10 @@ nav ul li a.logout:hover {
     grid-template-columns: 1fr 2fr;
     gap: 20px;
     align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
 }
 
 .admin-profile-container img {
@@ -264,24 +272,32 @@ nav ul li a.logout:hover {
     height: 150px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid #007bff;
+    border: 3px solid #6c8299;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px; /* Add some space below the image */
 }
 
 .admin-profile-container .admin-info {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    width: 100%;
 }
 
 .admin-profile-container h2 {
     font-size: 1.8em;
-    color: #333;
+    color: #ffffff;
     margin-bottom: 5px;
 }
 
 .admin-profile-container p {
     font-size: 1em;
-    color: #666;
+    color: #eeeeee;
+    line-height: 1.5;
+}
+.admin-profile-container li {
+    font-size: 1em;
+    color: #eeeeee;
     line-height: 1.5;
 }
 
@@ -324,7 +340,7 @@ nav ul li a.logout:hover {
     display: inline-block;
     margin-top: 10px;
     padding: 10px 15px;
-    background-color: #007bff;
+    background-color: #6c8299;
     color: white;
     text-decoration: none;
     border-radius: 5px;
@@ -332,7 +348,7 @@ nav ul li a.logout:hover {
 }
 
 .admin-news-section .btn-manage:hover {
-    background-color: #0056b3;
+    background-color: #303030;
 }
 
 
@@ -346,4 +362,25 @@ nav ul li a.logout:hover {
         opacity: 1;
         transform: translateY(0);
     }
+}
+.btn-delete {
+    background-color: #ff4d4d;
+    color: white;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 3px;
+    margin-left: 5px;
+}
+
+.btn-delete:hover {
+    background-color: #ff1a1a;
+}
+.logo-container {
+    text-align: center;
+    margin-bottom: 1px;
+}
+
+.logo-image {
+    max-width: 400px;
+    height: auto;
 }

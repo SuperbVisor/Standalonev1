@@ -1,17 +1,131 @@
 {% extends "index.html" %}
 {% block title %}User Profile{% endblock %}
-{% block content %}
-<div class="profile-container">
-    <img src="{{ user.profile_picture }}" alt="User Picture">
-    <h2>{{ user.username }}</h2>
-    <p>{{ user.bio }}</p>
-    <a href="/edit_profile" class="btn-edit">Edit Profile</a>
 
-    <h3>Your Favorite Games</h3>
-    <ul>
-        {% for game in favorite_games %}
-        <li>{{ game.name }} - {{ game.genre }}</li>
-        {% endfor %}
-    </ul>
+{% block content %}
+<style>
+    .profile-container {
+        max-width: 600px;
+        margin: 2rem auto;
+        padding: 2rem;
+        border-radius: 30px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+    }
+
+    h2 {
+        color: #6c8299;
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #ffffff;
+        font-weight: bold;
+        border-radius: 10px;
+    }
+
+    input[type="text"], textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #ced4da;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    input[type="text"]:focus, textarea:focus {
+        outline: none;
+        border-color: #3c005f;
+        border-style:inset;
+        box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.411);
+    }
+
+    textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .profile-picture {
+        display: block;
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin: 0 auto 1rem;
+        border: 3px solid #6c8299;
+    }
+
+    .btn-update {
+        display: block;
+        width: 100%;
+        padding: 0.75rem;
+        background-color: #6c8299;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-update:hover {
+        background-color: #303030;
+    }
+    .custom-file-upload {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #6d6d6d;
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    .custom-file-upload:hover {
+        background-color: #303030;
+    }
+
+    #profile_pic {
+        display: none;
+    }
+
+    #file-name-display {
+        margin-top: 5px;
+        font-style: italic;
+    }
+</style>
+
+<div class="profile-container">
+    <h2>Your Profile</h2>
+    <form action="{{ url_for('profile') }}" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            {% if user.profile_pic %}
+                <img src="{{ url_for('static', filename='uploads/' + user.profile_pic) }}" alt="Profile Picture" class="profile-picture">
+            {% else %}
+                <img src="{{ url_for('uploads', filename='default.jpg') }}" alt="Default Profile Picture" class="profile-picture">
+            {% endif %}
+            <label for="profile_pic" class="custom-file-upload">
+                Choose Profile Picture
+            </label>
+            <input type="file" id="profile_pic" name="profile_pic" accept="image/*" onchange="updateFileName(this)">
+            <div id="file-name-display"></div>
+        </div>
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" value="{{ user.username }}" required>
+        </div>
+        <div class="form-group">
+            <label for="bio">Bio:</label>
+            <textarea id="bio" name="bio" rows="4">{{ user.bio }}</textarea>
+        </div>
+        <button type="submit" class="btn-update">Update Profile</button>
+    </form>
 </div>
 {% endblock %}

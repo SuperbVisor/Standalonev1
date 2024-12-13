@@ -1,24 +1,224 @@
 {% extends "index.html" %}
 {% block title %}Admin Profile{% endblock %}
 {% block content %}
-<div class="admin-profile-container">
-    <img src="{{ admin.profile_picture }}" alt="Admin Picture">
-    <div class="admin-info">
-        <h2>{{ admin.username }}</h2>
-        <p>{{ admin.bio }}</p>
-        <a href="/edit_admin_profile" class="btn-edit">Edit Profile</a>
+<style>
+    .admin-news-section {
+        background-color: rgba(255, 255, 255, 0.1); /* Light white background */
+        backdrop-filter: blur(10px); /* Blur effect */
+        -webkit-backdrop-filter: blur(10px); /* For Safari support */
+        border-radius: 10px; /* Rounded corners */
+        padding: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    }
+</style>
+<div class="admin-dashboard">
+    <div class="admin-profile-container">
+        <img src="{{ url_for('static', filename='img/adminpp.jpg') }}" alt="Admin Profile Picture" class="admin-profile-picture">
+        <div class="admin-info">
+            <h2>{{ admin.username }}</h2>
+            <p>Web Game store developers who create them from 0 to hero we don't use templates at all, Our Team:</p>
+                
+            <li>1. Munif Aryaputra       | 22.83.0787</li> 
+            <li>2. Alif Miftahul Firdaus | 22.83.0816</li> 
+            <li>3. Rafid Ramadani        | 22.83.0778</li> 
+            <li>4. Egar Athwal Mahali    | 22.83.0781</li> 
+        </div>
+    </div>
+
+    <div class="admin-news-section">
+        <h3>Recently Added Games</h3>
+        <ul class="game-list">
+            {% for game in recent_games %}
+            <li class="game-item">
+                <div class="game-info">
+                    <strong>{{ game.name }}</strong> - {{ game.genre }}
+                </div>
+                <div class="game-actions">
+                    <a href="{{ url_for('edit_game', game_id=game.id) }}" class="btn btn-edit">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <button class="btn btn-delete" onclick="showDeleteModal('{{ game.id }}', '{{ game.name }}')">
+                        <i class="fas fa-trash-alt"></i> Delete
+                    </button>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <h2>Confirm Deletion</h2>
+            <p>Are you sure you want to delete the game "<span id="gameName"></span>"?</p>
+            <div class="modal-actions">
+                <button id="cancelDelete" class="btn btn-secondary">Cancel</button>
+                <button id="confirmDelete" class="btn btn-danger">Delete</button>
+            </div>
+        </div>
     </div>
 </div>
+<style>
+    .admin-dashboard {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
 
-<div class="admin-news-section">
-    <h3>Recently Added Games</h3>
-    <ul>
-        {% for game in recent_games %}
-        <li>
-            <strong>{{ game.name }}</strong> - {{ game.genre }}
-            <a href="/edit_game/{{ game.id }}" class="btn-manage">Edit</a>
-        </li>
-        {% endfor %}
-    </ul>
-</div>
+.admin-profile-container, .admin-news-section {
+    flex: 1;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.admin-news-section h3{
+    color: #fefefe;
+}
+
+.admin-profile-picture {
+    max-width: 100%;
+    height: auto;
+    border-radius: 50%;
+}
+
+.admin-info {
+    margin-top: 15px;
+}
+
+.admin-news-section ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.admin-news-section li {
+    margin-bottom: 10px;
+}
+
+    .game-list {
+        list-style-type: none;
+        padding: 0;
+    }
+    .game-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        margin-bottom: 10px;
+        background-color: #f9f9f9;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        transition: box-shadow 0.3s ease;
+    }
+    .game-item:hover {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    .game-actions {
+        display: flex;
+        gap: 10px;
+    }
+    .btn {
+        padding: 8px 12px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .btn-edit {
+        background-color: #2e2e2e;
+        color: white;
+        text-decoration: none;
+    }
+    .btn-edit:hover {
+        background-color: #dbdbdb;
+    }
+    .btn-delete {
+        background-color: #f44336;
+        color: white;
+    }
+    .btn-delete:hover {
+        background-color: #d32f2f;
+    }
+    .fas {
+        font-size: 16px;
+    }
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border-radius: 8px;
+        width: 80%;
+        max-width: 400px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    .modal h2 {
+        margin-top: 0;
+        color: #333;
+    }
+    .modal p {
+        margin-bottom: 20px;
+        color: #666;
+    }
+    .modal-actions {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+    .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+    }
+    .btn-danger:hover {
+        background-color: #c82333;
+    }
+</style>
+
+<script>
+    function showDeleteModal(gameId, gameName) {
+        const modal = document.getElementById('deleteModal');
+        const gameNameSpan = document.getElementById('gameName');
+        const cancelBtn = document.getElementById('cancelDelete');
+        const confirmBtn = document.getElementById('confirmDelete');
+
+        gameNameSpan.textContent = gameName;
+        modal.style.display = 'block';
+
+        cancelBtn.onclick = function() {
+            modal.style.display = 'none';
+        }
+
+        confirmBtn.onclick = function() {
+            // Use the correct URL with the gameId
+            window.location.href = "{{ url_for('delete_game', game_id=0) }}".replace('0', gameId);
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    }
+</script>
+
 {% endblock %}

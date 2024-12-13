@@ -28,7 +28,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
-    profile_pic = db.Column(db.String(120), default='default.png')
+    profile_pic = db.Column(db.String(120), default='default.png')  # Changed from profile_picture to profile_pic
     bio = db.Column(db.String(255), default='')
 
 class Admin(db.Model):
@@ -63,7 +63,17 @@ def index():
     if 'user_id' in session or 'admin_id' in session:
         games = Game.query.all()
         return render_template('dashboard.html', games=games)
-    return render_template('index.html')
+    else:
+        # Get stats for the landing page
+        visitor_count = User.query.count()  # This is a simple count of registered users
+        user_count = User.query.count()  # Same as visitor_count in this case
+        online_users = 0  # You'll need to implement a way to track online users
+
+        return render_template('landing.html', 
+                               visitor_count=visitor_count, 
+                               user_count=user_count, 
+                               online_users=online_users,
+                               )
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -75,12 +85,14 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
             session['user_id'] = user.id
+            session['username'] = user.username  # Add this line
             return redirect(url_for('index'))
 
         # Check Admin Login
         admin = Admin.query.filter_by(username=username).first()
         if admin and check_password_hash(admin.password, password):
             session['admin_id'] = admin.id
+            session['username'] = admin.username  # Add this line
             return redirect(url_for('index'))
 
         flash('Invalid username or password', 'error')
@@ -117,15 +129,28 @@ def profile():
         if request.method == 'POST':
             user.username = request.form['username']
             user.bio = request.form['bio']
+            
+            if 'profile_pic' in request.files:
+                file = request.files['profile_pic']
+                if file and allowed_file(file.filename):
+                    filename = secure_filename(file.filename)
+                    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                    file.save(file_path)
+                    user.profile_pic = filename
+            
             db.session.commit()
             flash('Profile updated successfully', 'success')
-
+            return redirect(url_for('profile'))
+        
         return render_template('profile.html', user=user)
+    
     elif 'admin_id' in session:
         admin = Admin.query.get(session['admin_id'])
-        games = Game.query.all()
-        return render_template('admin_profile.html', admin=admin, games=games)
+        recent_games = Game.query.order_by(Game.id.desc()).limit(5).all()
+        return render_template('admin_profile.html', admin=admin, recent_games=recent_games)
+    
     return redirect(url_for('login'))
+
 
 @app.route('/add_game', methods=['GET', 'POST'])
 def add_game():

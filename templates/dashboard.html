@@ -1,13 +1,104 @@
 {% extends "index.html" %}
-{% block title %}Dashboard{% endblock %}
+{% block title %}LJS Game Center{% endblock %}
 {% block content %}
-<h2>Game Dashboard</h2>
 
-<!-- Form Search -->
-<form action="/search" method="get" class="search-form">
-    <input type="text" name="query" placeholder="Search games by name or genre..." required>
-    <button type="submit">Search</button>
-</form>
+<style>
+    .search-container {
+  display: flex;
+  align-items: center;
+  max-width: 400px;
+  margin: 20px auto;
+}
+
+.got-search-input {
+  flex-grow: 1;
+  padding: 10px 15px;
+  font-size: 16px;
+  border: 2px solid #272727;
+  border-radius: 5px 0 0 5px;
+  background-color: #FFF8DC;
+  color: #4B3621;
+  transition: all 0.3s ease;
+}
+
+.got-search-input:focus {
+  outline: none;
+  box-shadow: 0 0 5px #bebebe;
+}
+
+.got-search-button {
+  padding: 10px 15px;
+  background-color: #3b3b3b;
+  border: none;
+  border-radius: 0 5px 5px 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.got-search-button:hover {
+  background-color: #3644be;
+  transform: scale(1.05);
+}
+
+.got-search-icon {
+  width: 24px;
+  height: 24px;
+  color: #FFF8DC;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.got-search-button:hover .got-search-icon {
+  animation: pulse 1s infinite;
+}
+
+
+    .search-form {
+        display: flex;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        border-radius: 50px;
+        overflow: hidden;
+    }
+
+    .search-input {
+        flex-grow: 1;
+        border: none;
+        padding: 15px 20px;
+        font-size: 16px;
+        outline: none;
+    }
+
+    .search-button {
+        background-color: #505050;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .search-button:hover {
+        background-color: #0056b3;
+    }
+</style>
+<div class="logo-container">
+    <img src="{{ url_for('static', filename='img/ljs.png') }}" alt="LJS Game Center Logo" class="logo-image">
+</div>
+
+<form action="/search" method="get" class="search-container">
+    <input type="text" name="query" placeholder="Search the Seven Kingdoms..." class="got-search-input" required>
+    <button type="submit" class="got-search-button">
+      <svg class="got-search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+    </button>
+  </form>
 
 <!-- Game List -->
 <div class="game-list">

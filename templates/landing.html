@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to LJS Game Center</title>
+    <link rel="icon" href="{{ url_for('static', filename='img/icon_web.png') }}" type="image/png">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing_styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alata&display=swap" rel="stylesheet">
+    <style>
+        body, h1, h2, h3, p, button, a{
+            font-family: "Alata", sans-serif;
+        }
+        
+
+        .button {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5em 1.5em;
+            background-color: #5e397c;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            text-decoration: none;
+            transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 0 10px rgba(94, 57, 124, 0.5);
+        }
+
+        .button:hover {
+            background-color: #6f4b92;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(94, 57, 124, 0.8);
+        }
+
+
+    
+
+    .button .arrow-container {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        margin-left: 0.5em;
+        padding: 0.2em;
+        width: 1.5em;
+        height: 1.5em;
+        background-color: #e7e7e7;
+        border-radius: 50%;
+        transition: transform 0.3s, background-color 0.3s;
+    }
+
+    .button .arrow-container svg {
+        width: 1em;
+        height: 1em;
+        fill: #575757;
+    }
+
+    .button:hover .arrow-container {
+        transform: translateX(5px);
+        background-color: #575757;
+    }
+
+    .button:hover .arrow-container svg {
+        fill: #fff;
+    }
+
+        .cta {
+            display: flex;
+            justify-content: center;
+
+            gap: 1em;
+            margin-top: 2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="landing-page">
+        <div class="container">
+            <!-- Hero Section -->
+            <section class="hero">
+                <img src="static/img/logoatas.png" alt="">
+                <p>Your ultimate destination for gaming adventures!</p>
+                <button class="button">
+                    Discover More
+                    <div class="arrow-container">
+                        <svg viewBox="0 0 45 38" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M43.7678 20.7678C44.7441 19.7915 44.7441 18.2085 43.7678 17.2322L27.8579 1.32233C26.8816 0.34602 25.2986 0.34602 24.3223 1.32233C23.346 2.29864 23.346 3.88155 24.3223 4.85786L38.4645 19L24.3223 33.1421C23.346 34.1184 23.346 35.7014 24.3223 36.6777C25.2986 37.654 26.8816 37.654 27.8579 36.6777L43.7678 20.7678ZM0 21.5L42 21.5V16.5L0 16.5L0 21.5Z"/>
+                        </svg>
+                    </div>
+                </button>
+            </section>
+
+            <!-- Main Content -->
+            <div class="content-box">
+                <!-- About Us Section -->
+                <section id="about" class="about-us">
+                    <h2><i class="fas fa-users"></i> About Us</h2>
+                    <p>LJS Game Center is a passionate community of gamers and developers dedicated to bringing you the best gaming experience. Our team works tirelessly to curate and deliver top-notch games for all types of players.</p>
+                </section>
+
+                <!-- About This Web Section -->
+                <section class="about-web">
+                    <h2><i class="fas fa-globe"></i> About This Web</h2>
+                    <p>LJS Game Center is your one-stop platform for discovering, downloading, and enjoying a wide variety of games. From action-packed adventures to mind-bending puzzles, we've got something for everyone!</p>
+                    <ul>
+                        <li><i class="fas fa-search"></i> Easy game search and discovery</li>
+                        <li><i class="fas fa-download"></i> Secure downloads</li>
+                        <li><i class="fas fa-comments"></i> Community features</li>
+                        <li><i class="fas fa-sync-alt"></i> Regular updates and new releases</li>
+                    </ul>
+                </section>
+
+                <!-- Visitor Stats Section -->
+                <section class="visitor-stats">
+                    <h2 class="text1"><i class="fas fa-chart-bar"></i> Community Stats</h2>
+                    <div class="stat-container">
+                        <div class="stat-item">
+                            <i class="fas fa-users"></i>
+                            <h3>Total Visitors</h3>
+                            <p class="stat-number">{{ visitor_count }}</p>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-user-plus"></i>
+                            <h3>Registered Users</h3>
+                            <p class="stat-number">{{ user_count }}</p>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-download"></i>
+                            <h3>Games Downloaded</h3>
+                            <p class="stat-number">{{ downloads }}</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Call to Action -->
+                <section class="cta">
+                    <a href="{{ url_for('register') }}" class="button">
+                        <i class="fas fa-user-plus"></i> Sign Up Now
+                    </a>
+                    <a href="{{ url_for('login') }}" class="button">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                </section>
+            </div>
+        </div>
+    </body>
+    <script>
+        const aboutSection = document.getElementById('about');
+        const button = document.querySelector('.button');
+    
+        button.addEventListener('click', () => {
+            if (aboutSection) {
+                aboutSection.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                console.error('The "about" section was not found.');
+            }
+        });
+    </script>
+    </html>

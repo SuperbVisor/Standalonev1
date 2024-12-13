@@ -1,3 +1,4 @@
+
 {% extends "index.html" %}
 {% block title %}Add Game{% endblock %}
 {% block content %}
@@ -6,10 +7,44 @@
     <form action="/add_game" method="post" enctype="multipart/form-data">
         <input type="text" name="name" placeholder="Game Name" required>
         <input type="text" name="genre" placeholder="Genre" required>
-        <input type="file" name="image_file" accept="image/*" required>
-        <textarea name="description" placeholder="Description" required></textarea>
+        <input type="file" name="image_file" id="image_file" accept="image/*" style="display: none;">
+        <button type="button" onclick="document.getElementById('image_file').click()" class="image-button">
+            Choose Image
+            <span id="file-chosen">No file chosen</span>
+        </button>
+        <textarea name="description" placeholder="Game Description" required></textarea>
         <input type="url" name="download_url" placeholder="Download URL" required>
         <button type="submit">Add Game</button>
     </form>
 </div>
+
+<script>
+    const fileInput = document.getElementById('image_file');
+    const fileChosen = document.getElementById('file-chosen');
+
+    fileInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            fileChosen.textContent = this.files[0].name;
+        } else {
+            fileChosen.textContent = 'No file chosen';
+        }
+    });
+</script>
+
+<style>
+    .image-button {
+        position: relative;
+        padding: 10px;
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        cursor: pointer;
+        width: 100%;
+        text-align: left;
+    }
+    #file-chosen {
+        position: absolute;
+        right: 10px;
+        color: #f1f1f1;
+    }
+</style>
 {% endblock %}
