@@ -12,13 +12,13 @@ import requests
 # Google Sign-In Configuration
 GOOGLE_CLIENT_ID = "260418655884-g8qql6osd9hclkof5835g4hv6j8qekib.apps.googleusercontent.com"
 GOOGLE_CLIENT_SECRET = "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"
-GOOGLE_DISCOVERY_URL = "https://gamestorefree-edczbmc0e5hdb9en.southeastasia-01.azurewebsites.net/login/google/callback"
+GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configuration"
 
 # Configure Google Sign-In flow
 flow = Flow.from_client_secrets_file(
     'client_secrets.json',
     scopes=['openid', 'email', 'profile'],
-    redirect_uri='http://127.0.0.1:5000/login/google/callback'
+    redirect_uri='https://gamestorefree-edczbmc0e5hdb9en.southeastasia-01.azurewebsites.net/login/google/callback'
 )
 
 app = Flask(__name__)
