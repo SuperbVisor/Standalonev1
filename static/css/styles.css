@@ -440,4 +440,35 @@ nav ul li a.logout:hover {
     height: 100%;
     object-fit: cover;
 }
+.sso-container {
+    margin-top: 20px;
+    text-align: center;
+    color: white;
+}
+
+.sso-container span{
+    color: black;
+}
+
+.google-signin-button {
+    display: inline-flex;
+    align-items: center;
+    background-color: #ffffff;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 5px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.google-signin-button:hover {
+    background-color: #dbdbdb;
+}
+
+.google-signin-button img {
+    margin-right: 10px;
+}
 

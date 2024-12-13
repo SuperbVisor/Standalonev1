@@ -3,7 +3,23 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt, check_password_hash
 import os
 from werkzeug.utils import secure_filename
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import Flow
+from google.auth.transport.requests import Request
+import requests
 
+
+# Google Sign-In Configuration
+GOOGLE_CLIENT_ID = "260418655884-g8qql6osd9hclkof5835g4hv6j8qekib.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET = "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"
+GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configuration"
+
+# Configure Google Sign-In flow
+flow = Flow.from_client_secrets_file(
+    'client_secrets.json',
+    scopes=['openid', 'email', 'profile'],
+    redirect_uri='http://localhost:5000/callback'
+)
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
@@ -63,6 +79,44 @@ with app.app_context():
     setup_admin()
 
 # Routes
+@app.route('/google-login')
+def google_login():
+    authorization_url, state = flow.authorization_url()
+    session['state'] = state
+    return redirect(authorization_url)
+
+@app.route('/callback')
+def callback():
+    flow.fetch_token(authorization_response=request.url)
+
+    if not session['state'] == request.args['state']:
+        abort(500)  # State does not match!
+
+    credentials = flow.credentials
+    request_session = requests.session()
+    token_request = requests.Request().prepare()
+
+    token_request.headers['Authorization'] = f'Bearer {credentials.token}'
+    token_request.url = 'https://www.googleapis.com/oauth2/v3/userinfo'
+    response = request_session.send(token_request)
+    userinfo = response.json()
+
+    # Check if user exists, if not, create a new user
+    user = User.query.filter_by(email=userinfo['email']).first()
+    if not user:
+        user = User(email=userinfo['email'], 
+                    username=userinfo['name'], 
+                    password=bcrypt.generate_password_hash('google_auth').decode('utf-8'))
+        db.session.add(user)
+        db.session.commit()
+
+    # Log in the user
+    session['user_id'] = user.id
+    session['username'] = user.username
+    flash('Logged in successfully via Google', 'success')
+    return redirect(url_for('index'))
+
+
 @app.route('/404')
 def error_404():
     return render_template('404.html'), 404
