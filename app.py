@@ -113,6 +113,7 @@ def callback():
     # Log in the user
     session['user_id'] = user.id
     session['username'] = user.username
+    print("After Google login, session:", session)  # Debug: Print session after setting
     flash('Logged in successfully via Google', 'success')
     return redirect(url_for('index'))  # This will redirect to the dashboard
 
@@ -124,12 +125,15 @@ def error_404():
 
 @app.route('/')
 def index():
+    print("Session:", session)  # Debug: Print session contents
     if 'user_id' in session or 'admin_id' in session:
         games = Game.query.all()
         if 'user_id' in session:
             user = User.query.get(session['user_id'])
+            print("User:", user)  # Debug: Print user object
         else:
             user = Admin.query.get(session['admin_id'])
+            print("Admin:", user)  # Debug: Print admin object
         return render_template('dashboard.html', user=user, games=games)
     else:
         # Get stats for the landing page
@@ -141,6 +145,7 @@ def index():
                                visitor_count=visitor_count, 
                                user_count=user_count, 
                                online_users=online_users)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
