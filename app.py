@@ -22,7 +22,7 @@ flow = Flow.from_client_secrets_file(
 )
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'
+app.secret_key = '123'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///game_store.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 bcrypt = Bcrypt(app)
@@ -88,46 +88,47 @@ def google_login():
 
 @app.route('/login/google/callback')
 def callback():
-    try:
-        flow.fetch_token(authorization_response=request.url)
-
-        if not session.get('state') == request.args.get('state'):
-            app.logger.error("State mismatch in Google callback")
-            abort(500)  # State does not match!
-
-        credentials = flow.credentials
-        request_session = requests.session()
-        token_request = requests.Request().prepare()
-
-        token_request.headers['Authorization'] = f'Bearer {credentials.token}'
-        token_request.url = 'https://www.googleapis.com/oauth2/v3/userinfo'
-        response = request_session.send(token_request)
-        response.raise_for_status()  # Raise an error for bad responses
-        userinfo = response.json()
-
-        # Check if user exists, if not, create a new user
-        user = User.query.filter_by(email=userinfo['email']).first()
-        if not user:
-            user = User(email=userinfo['email'], 
-                        username=userinfo.get('name', 'Google User'),  # Fallback if name is not provided
-                        password=bcrypt.generate_password_hash('google_auth').decode('utf-8'))
-            db.session.add(user)
-            db.session.commit()
-
-        # Log in the user
-        session['user_id'] = user.id
-        session['username'] = user.username
-        app.logger.info(f"After Google login, session: {session}")
-        flash('Logged in successfully via Google', 'success')
-        return redirect(url_for('index'))
-
-    except Exception as e:
-        app.logger.error(f"Error in Google callback: {str(e)}")
-        flash('An error occurred during Google login. Please try again.', 'error')
+    # Step 1: Complete the Google authentication flow
+    flow.fetch_token(authorization_response=request.url)
+    if not session.get('state') == request.args.get('state'):
+        app.logger.error("Invalid state parameter")
+        flash("Invalid state parameter. Login failed.", "error")
         return redirect(url_for('login'))
 
+    # Step 2: Get user info from Google
+    credentials = flow.credentials
+    headers = {'Authorization': f'Bearer {credentials.token}'}
+    response = requests.get('https://www.googleapis.com/oauth2/v3/userinfo', headers=headers)
+    
+    if response.status_code != 200:
+        app.logger.error(f"Failed to fetch user info: {response.text}")
+        flash("An error occurred while authenticating with Google. Please try again.", "error")
+        return redirect(url_for('login'))
 
+    userinfo = response.json()
+    app.logger.info(f"Received user info from Google: {userinfo}")
 
+    # Step 3: Check if user exists in your database, if not, create a new user
+    user = User.query.filter_by(email=userinfo['email']).first()
+    if not user:
+        app.logger.info(f"Creating new user with email: {userinfo['email']}")
+        user = User(
+            email=userinfo['email'],
+            username=userinfo.get('name', 'Google User'),
+            password=bcrypt.generate_password_hash('google_auth').decode('utf-8')
+        )
+        db.session.add(user)
+        db.session.commit()
+    else:
+        app.logger.info(f"Existing user found with email: {userinfo['email']}")
+
+    # Step 4: Log in the user
+    session['user_id'] = user.id
+    session['username'] = user.username
+    app.logger.info(f"User logged in. Session: {session}")
+    flash('Logged in successfully via Google', 'success')
+
+    return redirect(url_for('index'))
 
 
 @app.route('/404')
