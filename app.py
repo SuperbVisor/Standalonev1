@@ -86,37 +86,49 @@ def google_login():
     return redirect(authorization_url)
 
 
-@app.route('/login/google/callback')
+@app.route('/callback')
 def callback():
-        flow.fetch_token(authorization_response=request.url)
-        if not session.get('state') == request.args.get('state'):
-            raise ValueError("Invalid state parameter")
+    # Step 1: Complete the Google authentication flow
+    flow.fetch_token(authorization_response=request.url)
+    if not session.get('state') == request.args.get('state'):
+        app.logger.error("Invalid state parameter")
+        flash("Invalid state parameter. Login failed.", "error")
+        return redirect(url_for('login'))
 
-        credentials = flow.credentials
-        request_session = requests.session()
-        cached_session = cachecontrol.CacheControl(request_session)
-        token_request = google.auth.transport.requests.Request(session=cached_session)
+    # Step 2: Get user info from Google
+    credentials = flow.credentials
+    headers = {'Authorization': f'Bearer {credentials.token}'}
+    response = requests.get('https://www.googleapis.com/oauth2/v3/userinfo', headers=headers)
+    
+    if response.status_code != 200:
+        app.logger.error(f"Failed to fetch user info: {response.text}")
+        flash("An error occurred while authenticating with Google. Please try again.", "error")
+        return redirect(url_for('login'))
 
-        id_info = id_token.verify_oauth2_token(
-            id_token=credentials._id_token,
-            request=token_request,
-            audience=GOOGLE_CLIENT_ID
+    userinfo = response.json()
+    app.logger.info(f"Received user info from Google: {userinfo}")
+
+    # Step 3: Check if user exists in your database, if not, create a new user
+    user = User.query.filter_by(email=userinfo['email']).first()
+    if not user:
+        app.logger.info(f"Creating new user with email: {userinfo['email']}")
+        user = User(
+            email=userinfo['email'],
+            username=userinfo.get('name', 'Google User'),
+            password=bcrypt.generate_password_hash('google_auth').decode('utf-8')
         )
-        # Process user information and log in
-        user = User.query.filter_by(email=id_info.get("email")).first()
-        if not user:
-            user = User(
-                email=id_info.get("email"),
-                username=id_info.get("name"),
-                password=bcrypt.generate_password_hash('google_auth').decode('utf-8')
-            )
-            db.session.add(user)
-            db.session.commit()
+        db.session.add(user)
+        db.session.commit()
+    else:
+        app.logger.info(f"Existing user found with email: {userinfo['email']}")
 
-        session['user_id'] = user.id
-        session['username'] = user.username
-        flash('Logged in successfully via Google', 'success')
-        return redirect(url_for('index'))
+    # Step 4: Log in the user
+    session['user_id'] = user.id
+    session['username'] = user.username
+    app.logger.info(f"User logged in. Session: {session}")
+    flash('Logged in successfully via Google', 'success')
+
+    return redirect(url_for('index'))
 
 @app.route('/')
 def index():
@@ -347,6 +359,6 @@ def search():
 @app.route('/404')
 def error_404():
     return render_template('404.html'), 404
-
+    
 if __name__ == '__main__':
     app.run(debug=True)
