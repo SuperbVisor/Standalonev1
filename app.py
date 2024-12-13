@@ -127,7 +127,7 @@ def login():
 
     return render_template('login.html')
 
-@app.route('/login/google/')
+@app.route('/login/google/callback')
 def login_google():
     authorization_url, state = flow.authorization_url()
     session['state'] = state
