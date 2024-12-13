@@ -18,7 +18,7 @@ GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configura
 flow = Flow.from_client_secrets_file(
     'client_secrets.json',
     scopes=['openid', 'email', 'profile'],
-    redirect_uri='https://gamestorefree-edczbmc0e5hdb9en.southeastasia-01.azurewebsites.net/login/google/callback'
+    redirect_uri='https://gamestorefree-edczbmc0e5hdb9en.southeastasia-01.azurewebsites.net/callback'
 )
 
 app = Flask(__name__)
