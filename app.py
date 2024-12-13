@@ -127,14 +127,14 @@ def login():
 
     return render_template('login.html')
 
-@app.route('/google-login')
-def google_login():
+@app.route('/login/google/callback')
+def login_google():
     authorization_url, state = flow.authorization_url()
     session['state'] = state
     return redirect(authorization_url)
 
 
-@app.route('/callback')
+@app.route('/login/google/callback')
 def callback():
     # Step 1: Complete the Google authentication flow
     flow.fetch_token(authorization_response=request.url)
