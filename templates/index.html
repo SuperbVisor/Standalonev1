@@ -127,5 +127,42 @@
         });
     </script>
 </div>
+<div class="page-transition"></div>
 </body>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const transitionElement = document.querySelector('.page-transition');
+
+    function startTransition(url) {
+        transitionElement.classList.add('active');
+        transitionElement.classList.add('slide-in');
+        
+        setTimeout(() => {
+            window.location.href = url;
+        }, 500);
+    }
+
+    // Intercept all internal links
+    document.body.addEventListener('click', (e) => {
+        const link = e.target.closest('a');
+        if (link && link.getAttribute('href').startsWith('/')) {
+            e.preventDefault();
+            startTransition(link.href);
+        }
+    });
+
+    // Handle back button
+    window.addEventListener('pageshow', (event) => {
+        if (event.persisted) {
+            transitionElement.classList.add('active');
+            transitionElement.classList.add('slide-out');
+            
+            setTimeout(() => {
+                transitionElement.classList.remove('active', 'slide-out');
+            }, 500);
+        }
+    });
+});
+
+</script>
 </html>

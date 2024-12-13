@@ -1,24 +1,34 @@
-from flask import Flask, render_template, redirect, url_for, request, session, flash
+from flask import Flask, render_template, redirect, url_for, request, session, flash, make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt, check_password_hash
 import os
+import time
 from werkzeug.utils import secure_filename
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import Flow
 from google.auth.transport.requests import Request
 import requests
 
-
 # Google Sign-In Configuration
-GOOGLE_CLIENT_ID = "260418655884-g8qql6osd9hclkof5835g4hv6j8qekib.apps.googleusercontent.com"
-GOOGLE_CLIENT_SECRET = "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"
+GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
+GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
 GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configuration"
 
 # Configure Google Sign-In flow
-flow = Flow.from_client_secrets_file(
-    'client_secrets.json',
-    scopes=['openid', 'email', 'profile'],
-    redirect_uri='https://gamestorefree-edczbmc0e5hdb9en.southeastasia-01.azurewebsites.net/login/google/callback'
+flow = Flow.from_client_config(
+    {
+        "web": {
+            "client_id": '260418655884-g8qql6osd9hclkof5835g4hv6j8qekib.apps.googleusercontent.com',
+            "project_id": os.getenv('webs-apps-443712'),
+            "auth_uri": os.getenv('GOOGLE_AUTH_URI', 'https://accounts.google.com/o/oauth2/auth'),
+            "token_uri": os.getenv('GOOGLE_TOKEN_URI', 'https://oauth2.googleapis.com/token'),
+            "auth_provider_x509_cert_url": os.getenv('GOOGLE_AUTH_PROVIDER_X509_CERT_URL', 'https://www.googleapis.com/oauth2/v3/certs'),
+            "client_secret": GOOGLE_CLIENT_SECRET,
+            "redirect_uris": [os.getenv('https://gamestorefree-edczbmc0e5hdb9en.southeastasia-01.azurewebsites.net/login/google/callback')]
+        }
+    },
+    scopes=["openid", "email", "profile"],
+    redirect_uri=os.getenv('https://gamestorefree-edczbmc0e5hdb9en.southeastasia-01.azurewebsites.net/login/google/callback')
 )
 
 app = Flask(__name__)
@@ -37,10 +47,9 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['PROFILE_PIC_FOLDER'] = PROFILE_PIC_FOLDER
 
-# Ensure both folders exist
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(PROFILE_PIC_FOLDER, exist_ok=True)
-# Fungsi untuk memeriksa ekstensi file
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -78,30 +87,18 @@ with app.app_context():
     db.create_all()
     setup_admin()
 
-# Routes
 @app.route('/')
 def index():
-    print("Session:", session)  # Debug: Print session contents
     if 'user_id' in session or 'admin_id' in session:
         games = Game.query.all()
-        if 'user_id' in session:
-            user = User.query.get(session['user_id'])
-            print("User:", user)  # Debug: Print user object
-        else:
-            user = Admin.query.get(session['admin_id'])
-            print("Admin:", user)  # Debug: Print admin object
+        user = User.query.get(session['user_id']) if 'user_id' in session else Admin.query.get(session['admin_id'])
+        time.sleep(0.5)  # Add a small delay
         return render_template('dashboard.html', user=user, games=games)
-    else:
-        # Get stats for the landing page
-        visitor_count = User.query.count()
-        user_count = User.query.count()
-        online_users = 0  # You'll need to implement a way to track online users
-
-        return render_template('landing.html', 
-                               visitor_count=visitor_count, 
-                               user_count=user_count, 
-                               online_users=online_users)
-
+    visitor_count = User.query.count()
+    user_count = User.query.count()
+    online_users = 0
+    time.sleep(0.5)  # Add a small delay
+    return render_template('landing.html', visitor_count=visitor_count, user_count=user_count, online_users=online_users)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -109,73 +106,53 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
-        # Check User Login
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
             session['user_id'] = user.id
-            session['username'] = user.username  # Add this line
+            session['username'] = user.username
             return redirect(url_for('index'))
 
-        # Check Admin Login
         admin = Admin.query.filter_by(username=username).first()
         if admin and check_password_hash(admin.password, password):
             session['admin_id'] = admin.id
-            session['username'] = admin.username  # Add this line
+            session['username'] = admin.username
             return redirect(url_for('index'))
 
         flash('Invalid username or password', 'error')
 
     return render_template('login.html')
 
-@app.route('/login/google')
-def login_google():
+@app.route('/google_login')
+def google_login():
     authorization_url, state = flow.authorization_url()
     session['state'] = state
     return redirect(authorization_url)
 
-
 @app.route('/login/google/callback')
 def callback():
-    # Step 1: Complete the Google authentication flow
-    flow.fetch_token(authorization_response=request.url)
     if not session.get('state') == request.args.get('state'):
-        app.logger.error("Invalid state parameter")
         flash("Invalid state parameter. Login failed.", "error")
         return redirect(url_for('login'))
 
-    # Step 2: Get user info from Google
+    flow.fetch_token(authorization_response=request.url)
     credentials = flow.credentials
     headers = {'Authorization': f'Bearer {credentials.token}'}
     response = requests.get('https://www.googleapis.com/oauth2/v3/userinfo', headers=headers)
-    
+
     if response.status_code != 200:
-        app.logger.error(f"Failed to fetch user info: {response.text}")
-        flash("An error occurred while authenticating with Google. Please try again.", "error")
+        flash("Error authenticating with Google.", "error")
         return redirect(url_for('login'))
 
     userinfo = response.json()
-    app.logger.info(f"Received user info from Google: {userinfo}")
-
-    # Step 3: Check if user exists in your database, if not, create a new user
     user = User.query.filter_by(email=userinfo['email']).first()
     if not user:
-        app.logger.info(f"Creating new user with email: {userinfo['email']}")
-        user = User(
-            email=userinfo['email'],
-            username=userinfo.get('name', 'Google User'),
-            password=bcrypt.generate_password_hash('google_auth').decode('utf-8')
-        )
+        user = User(email=userinfo['email'], username=userinfo.get('name', 'Google User'), password=bcrypt.generate_password_hash('google_auth').decode('utf-8'))
         db.session.add(user)
         db.session.commit()
-    else:
-        app.logger.info(f"Existing user found with email: {userinfo['email']}")
 
-    # Step 4: Log in the user
     session['user_id'] = user.id
     session['username'] = user.username
-    app.logger.info(f"User logged in. Session: {session}")
     flash('Logged in successfully via Google', 'success')
-
     return redirect(url_for('index'))
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -185,34 +162,29 @@ def register():
         username = request.form['username']
         password = request.form['password']
         confirm_password = request.form['confirm_password']
-        
-        # Check if the passwords match
+
         if password != confirm_password:
-            flash('Passwords do not match. Please try again.', 'error')
+            flash('Passwords do not match.', 'error')
             return redirect(url_for('register'))
 
-        # Check if the username is 'admin123'
         if username.lower() == 'admin123':
-            flash('This username is reserved. Please choose a different username.', 'error')
+            flash('This username is reserved.', 'error')
             return redirect(url_for('register'))
 
-        # Check if the email or username already exists
         existing_user = User.query.filter((User.email == email) | (User.username == username)).first()
         if existing_user:
-            flash('Email or username already exists. Please choose different credentials.', 'error')
+            flash('Email or username already exists.', 'error')
             return redirect(url_for('register'))
 
-        # If all checks pass, proceed with registration
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
         new_user = User(email=email, username=username, password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
 
-        flash('Registration successful! Please log in.', 'success')
+        flash('Registration successful!', 'success')
         return redirect(url_for('login'))
 
     return render_template('register.html')
-
 
 @app.route('/logout')
 def logout():
@@ -226,7 +198,7 @@ def profile():
         if request.method == 'POST':
             user.username = request.form['username']
             user.bio = request.form['bio']
-            
+
             if 'profile_pic' in request.files:
                 file = request.files['profile_pic']
                 if file and allowed_file(file.filename):
@@ -234,18 +206,18 @@ def profile():
                     file_path = os.path.join(app.config['PROFILE_PIC_FOLDER'], filename)
                     file.save(file_path)
                     user.profile_pic = filename
-            
+
             db.session.commit()
             flash('Profile updated successfully', 'success')
             return redirect(url_for('profile'))
-        
+
         return render_template('profile.html', user=user)
-    
+
     elif 'admin_id' in session:
         admin = Admin.query.get(session['admin_id'])
         recent_games = Game.query.order_by(Game.id.desc()).limit(5).all()
         return render_template('admin_profile.html', admin=admin, recent_games=recent_games)
-    
+
     return redirect(url_for('login'))
 
 @app.route('/delete_account', methods=['POST'])
@@ -254,25 +226,15 @@ def delete_account():
         return redirect(url_for('login'))
 
     user = User.query.get(session['user_id'])
-    if not user:
-        flash('User not found', 'error')
-        return redirect(url_for('profile'))
-
-    # Delete the user's profile picture if it exists
-    if user.profile_pic and user.profile_pic != 'default.png':
-        try:
+    if user:
+        if user.profile_pic and user.profile_pic != 'default.png':
             os.remove(os.path.join(app.config['UPLOAD_FOLDER'], user.profile_pic))
-        except Exception as e:
-            print(f"Error deleting profile picture: {e}")
 
-    # Delete the user from the database
-    db.session.delete(user)
-    db.session.commit()
+        db.session.delete(user)
+        db.session.commit()
+        session.clear()
+        flash('Account deleted successfully.', 'success')
 
-    # Clear the session
-    session.clear()
-
-    flash('Your account has been successfully deleted.', 'success')
     return redirect(url_for('index'))
 
 @app.route('/add_game', methods=['GET', 'POST'])
@@ -282,8 +244,7 @@ def add_game():
         genre = request.form['genre']
         description = request.form['description']
         download_url = request.form['download_url']
-        
-        # Mengunggah file gambar
+
         image_file = request.files['image_file']
         if image_file and allowed_file(image_file.filename):
             filename = secure_filename(image_file.filename)
@@ -291,21 +252,13 @@ def add_game():
             image_file.save(image_path)
         else:
             return "Invalid image file", 400
-        
-        # Simpan data ke database
-        new_game = Game(
-            name=name,
-            genre=genre,
-            description=description,
-            download_url=download_url,
-            image_url=image_path  # Simpan path file
-        )
+
+        new_game = Game(name=name, genre=genre, description=description, download_url=download_url, image_url=image_path)
         db.session.add(new_game)
         db.session.commit()
         return redirect('/')
-    
-    return render_template('add_game.html')
 
+    return render_template('add_game.html')
 
 @app.route('/edit_game/<int:game_id>', methods=['GET', 'POST'])
 def edit_game(game_id):
@@ -315,21 +268,19 @@ def edit_game(game_id):
         game.genre = request.form['genre']
         game.description = request.form['description']
         game.download_url = request.form['download_url']
-        
-        # Perbarui file gambar jika ada file baru yang diunggah
+
         if 'image_file' in request.files:
             image_file = request.files['image_file']
             if image_file and allowed_file(image_file.filename):
                 filename = secure_filename(image_file.filename)
                 image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 image_file.save(image_path)
-                game.image_url = image_path  # Perbarui path gambar
-        
+                game.image_url = image_path
+
         db.session.commit()
         return redirect('/')
-    
-    return render_template('edit_game.html', game=game)
 
+    return render_template('edit_game.html', game=game)
 
 @app.route('/delete_game/<int:game_id>')
 def delete_game(game_id):
@@ -342,23 +293,29 @@ def delete_game(game_id):
     flash('Game deleted successfully', 'success')
     return redirect(url_for('index'))
 
-# Search Game
 @app.route('/search', methods=['GET'])
 def search():
     query = request.args.get('query', '').strip()
-    if query:
-        # Cari game berdasarkan nama atau genre (case-insensitive)
-        results = Game.query.filter(
-            (Game.name.ilike(f"%{query}%")) | (Game.genre.ilike(f"%{query}%"))
-        ).all()
-    else:
-        results = []
+    results = Game.query.filter((Game.name.ilike(f"%{query}%")) | (Game.genre.ilike(f"%{query}%"))).all() if query else []
     
-    return render_template('dashboard.html', games=results)
+    # Get the current user
+    user = None
+    if 'user_id' in session:
+        user = User.query.get(session['user_id'])
+    elif 'admin_id' in session:
+        user = Admin.query.get(session['admin_id'])
+    
+    return render_template('dashboard.html', games=results, user=user)
+
 
 @app.route('/404')
 def error_404():
     return render_template('404.html'), 404
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
 
 if __name__ == '__main__':
     app.run(debug=True)
