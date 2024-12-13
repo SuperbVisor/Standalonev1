@@ -114,7 +114,8 @@ def callback():
     session['user_id'] = user.id
     session['username'] = user.username
     flash('Logged in successfully via Google', 'success')
-    return redirect(url_for('index'))
+    return redirect(url_for('index'))  # This will redirect to the dashboard
+
 
 
 @app.route('/404')
