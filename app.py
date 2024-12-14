@@ -228,7 +228,7 @@ def delete_account():
     user = User.query.get(session['user_id'])
     if user:
         if user.profile_pic and user.profile_pic != 'default.png':
-            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], user.profile_pic))
+            os.remove(os.path.join(app.config['PROFILE_PIC_FOLDER'], user.profile_pic))
 
         db.session.delete(user)
         db.session.commit()

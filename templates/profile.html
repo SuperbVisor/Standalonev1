@@ -172,8 +172,93 @@
         </div>
         <button type="submit" class="btn-update">Update Profile</button>
     </form>
-    <form action="{{ url_for('delete_account') }}" method="POST" onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.');">
-        <button type="submit" class="btn-delete">Delete Account</button>
+    <form action="{{ url_for('delete_account') }}" method="POST">
+        <button type="button" class="btn-delete" onclick="showDeleteModal()">Delete Account</button>
     </form>
+
+    <!-- Add this modal structure -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <h3>Are you sure you want to delete your account?</h3>
+            <p>Email: <span id="userEmail"></span></p>
+            <p>Username: <span id="userName"></span></p>
+            <button onclick="confirmDelete()">Yes, Delete</button>
+            <button onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+    <style>
+        /* ... existing styles ... */
+    
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+    
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+        }
+        .modal-content p {
+            color: black;
+        }
+    
+        .modal-content h3 {
+            color: #333;
+        }
+    
+        .modal-content button {
+            margin: 10px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    
+        .modal-content button:first-of-type {
+            background-color: #dc3545;
+            color: white;
+        }
+    
+        .modal-content button:last-of-type {
+            background-color: #6c757d;
+            color: white;
+        }
+    </style>
+    
 </div>
+<script>
+    function showDeleteModal() {
+        document.getElementById('deleteModal').style.display = 'block';
+        document.getElementById('userEmail').textContent = '{{ user.email }}';
+        document.getElementById('userName').textContent = '{{ user.username }}';
+    }
+
+    function closeModal() {
+        document.getElementById('deleteModal').style.display = 'none';
+    }
+
+    function confirmDelete() {
+        document.querySelector('form[action="{{ url_for("delete_account") }}"]').submit();
+    }
+
+    // Close the modal if the user clicks outside of it
+    window.onclick = function(event) {
+        if (event.target == document.getElementById('deleteModal')) {
+            closeModal();
+        }
+    }
+</script>
+
 {% endblock %}
