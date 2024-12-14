@@ -6,13 +6,90 @@
 </div>
 <div class="form-container">
     <h2>Register</h2>
-    <form action="/register" method="post">
-        <input type="email" name="email" placeholder="Email" required>
+    <form id="registerForm" action="/register" method="post">
+        <input type="email" name="email" placeholder="Email" required pattern="^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" title="Email must contain both letters and numbers before the @ symbol">
         <input type="text" name="username" placeholder="Username" required>
-        <input type="password" name="password" placeholder="Password" required>
+        <input type="password" name="password" placeholder="Password" required minlength="8" pattern="(?=.*\d)(?=.*[a-zA-Z]).{8,}" title="Password must be at least 8 characters long and contain both letters and numbers">
         <input type="password" name="confirm_password" placeholder="Confirm Password" required>
         <button type="submit">Register</button>
     </form>
 </div>
-{% endblock %}
 
+<!-- Add this div for the pop-up -->
+<div id="popup" class="popup">
+    <p id="popupMessage"></p>
+</div>
+
+<style>
+    /* Add this CSS for the pop-up */
+    .popup {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 20px;
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        z-index: 1000;
+    }
+    .popup.success {
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+    }
+    .popup.error {
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+    }
+</style>
+
+<script>
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Additional client-side validation
+        const emailInput = this.querySelector('input[name="email"]');
+        const emailPattern = /^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        
+        if (!emailPattern.test(emailInput.value)) {
+            const popup = document.getElementById('popup');
+            const popupMessage = document.getElementById('popupMessage');
+            popup.className = 'popup error';
+            popupMessage.textContent = 'Invalid email format. Email must contain both letters and numbers before the @ symbol.';
+            popup.style.display = 'block';
+            setTimeout(() => {
+                popup.style.display = 'none';
+            }, 3000);
+            return;
+        }
+
+        fetch('/register', {
+            method: 'POST',
+            body: new FormData(this)
+        })
+        .then(response => response.json())
+        .then(data => {
+            const popup = document.getElementById('popup');
+            const popupMessage = document.getElementById('popupMessage');
+            
+            if (data.success) {
+                popup.className = 'popup success';
+                popupMessage.textContent = 'Registration successful!';
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 2000);
+            } else {
+                popup.className = 'popup error';
+                popupMessage.textContent = data.message;
+            }
+            
+            popup.style.display = 'block';
+            setTimeout(() => {
+                popup.style.display = 'none';
+            }, 3000);
+        });
+    });
+</script>
+
+{% endblock %}

@@ -1,7 +1,9 @@
 from flask import Flask, render_template, redirect, url_for, request, session, flash, make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt, check_password_hash
+from flask import jsonify
 import os
+import re
 import time
 from werkzeug.utils import secure_filename
 from google.oauth2.credentials import Credentials
@@ -163,26 +165,31 @@ def register():
         password = request.form['password']
         confirm_password = request.form['confirm_password']
 
+        # Email validation: must contain both text and numbers before @
+        email_pattern = r'^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_pattern, email):
+            return jsonify({'success': False, 'message': 'Invalid email format. Email must contain both letters and numbers before the @ symbol.'})
+
+        # Password validation
+        if len(password) < 8 or not (any(c.isalpha() for c in password) and any(c.isdigit() for c in password)):
+            return jsonify({'success': False, 'message': 'Password must be at least 8 characters long and contain both letters and numbers.'})
+
         if password != confirm_password:
-            flash('Passwords do not match.', 'error')
-            return redirect(url_for('register'))
+            return jsonify({'success': False, 'message': 'Passwords do not match.'})
 
         if username.lower() == 'admin123':
-            flash('This username is reserved.', 'error')
-            return redirect(url_for('register'))
+            return jsonify({'success': False, 'message': 'This username is reserved.'})
 
         existing_user = User.query.filter((User.email == email) | (User.username == username)).first()
         if existing_user:
-            flash('Email or username already exists.', 'error')
-            return redirect(url_for('register'))
+            return jsonify({'success': False, 'message': 'Email or username already exists.'})
 
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
         new_user = User(email=email, username=username, password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
 
-        flash('Registration successful!', 'success')
-        return redirect(url_for('login'))
+        return jsonify({'success': True, 'message': 'Registration successful!'})
 
     return render_template('register.html')
 
