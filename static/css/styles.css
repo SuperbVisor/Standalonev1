@@ -388,8 +388,7 @@ nav ul li a.logout:hover {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
+    backdrop-filter: blur(10px);
     border-radius: 5px;
     padding: 15px;
     max-width: 250px;
@@ -420,11 +419,13 @@ nav ul li a.logout:hover {
 .profile-box h4 {
     margin-top: 10px;
     margin-bottom: 10px;
+    color: whitesmoke;
 }
 
 .profile-box p {
     margin: 5px 0;
     font-size: 0.9em;
+    color: whitesmoke;
 }
 
 .profile-picture {
