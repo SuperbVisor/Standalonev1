@@ -24,11 +24,11 @@ flow = Flow.from_client_config(
             "token_uri": os.getenv('GOOGLE_TOKEN_URI', 'https://oauth2.googleapis.com/token'),
             "auth_provider_x509_cert_url": os.getenv('GOOGLE_AUTH_PROVIDER_X509_CERT_URL', 'https://www.googleapis.com/oauth2/v3/certs'),
             "client_secret": GOOGLE_CLIENT_SECRET,
-            "redirect_uris": [os.getenv('https://gamestorefree-edczbmc0e5hdb9en.southeastasia-01.azurewebsites.net/login/google/callback')]
+            "redirect_uris":'https://gamestorefree-edczbmc0e5hdb9en.southeastasia-01.azurewebsites.net/login/google/callback'
         }
     },
     scopes=["openid", "email", "profile"],
-    redirect_uri=os.getenv('https://gamestorefree-edczbmc0e5hdb9en.southeastasia-01.azurewebsites.net/login/google/callback')
+    redirect_uri=os.getenv('GOOGLE_REDIRECT_URI', 'https://gamestorefree-edczbmc0e5hdb9en.southeastasia-01.azurewebsites.net/login/google/callback')
 )
 
 app = Flask(__name__)
@@ -141,7 +141,7 @@ def callback():
 
     if response.status_code != 200:
         flash("Error authenticating with Google.", "error")
-        return redirect(url_for('login'))
+        return redirect(url_for('error_404'))
 
     userinfo = response.json()
     user = User.query.filter_by(email=userinfo['email']).first()
