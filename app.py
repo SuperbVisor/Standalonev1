@@ -141,7 +141,7 @@ def callback():
 
     if response.status_code != 200:
         flash("Error authenticating with Google.", "error")
-        return redirect(url_for('error_404'))
+        return redirect(url_for('login'))
 
     userinfo = response.json()
     user = User.query.filter_by(email=userinfo['email']).first()
