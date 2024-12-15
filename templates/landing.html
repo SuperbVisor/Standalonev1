@@ -3,196 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to LJS Game Center</title>
+    <title>Welcome To LJS Project</title>
+    <link rel="stylesheet" href="static/css/styleslanding.css">
     <link rel="icon" href="{{ url_for('static', filename='img/icon_web.png') }}" type="image/png">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing_styles.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Alata&display=swap" rel="stylesheet">
-    <style>
-        body, h1, h2, h3, p, button, a{
-            font-family: "Alata", sans-serif;
-        }
-        
-
-        .button {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.5em 1.5em;
-            background-color: #5e397c;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1em;
-            text-decoration: none;
-            transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
-            box-shadow: 0 0 10px rgba(94, 57, 124, 0.5);
-        }
-
-        .button:hover {
-            background-color: #6f4b92;
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(94, 57, 124, 0.8);
-        }
-
-
-    
-
-    .button .arrow-container {
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-        margin-left: 0.5em;
-        padding: 0.2em;
-        width: 1.5em;
-        height: 1.5em;
-        background-color: #e7e7e7;
-        border-radius: 50%;
-        transition: transform 0.3s, background-color 0.3s;
-    }
-
-    .button .arrow-container svg {
-        width: 1em;
-        height: 1em;
-        fill: #575757;
-    }
-
-    .button:hover .arrow-container {
-        transform: translateX(5px);
-        background-color: #575757;
-    }
-
-    .button:hover .arrow-container svg {
-        fill: #fff;
-    }
-
-        .cta {
-            display: flex;
-            justify-content: center;
-
-            gap: 1em;
-            margin-top: 2em;
-        }
-    </style>
 </head>
 <body>
-    <div class="landing-page">
-        <div class="container">
-            <!-- Hero Section -->
-            <section class="hero">
-                <img src="static/img/logoatas.png" alt="">
-                <p>Your ultimate destination for gaming adventures!</p>
-                <button class="button">
-                    Discover More
-                    <div class="arrow-container">
-                        <svg viewBox="0 0 45 38" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M43.7678 20.7678C44.7441 19.7915 44.7441 18.2085 43.7678 17.2322L27.8579 1.32233C26.8816 0.34602 25.2986 0.34602 24.3223 1.32233C23.346 2.29864 23.346 3.88155 24.3223 4.85786L38.4645 19L24.3223 33.1421C23.346 34.1184 23.346 35.7014 24.3223 36.6777C25.2986 37.654 26.8816 37.654 27.8579 36.6777L43.7678 20.7678ZM0 21.5L42 21.5V16.5L0 16.5L0 21.5Z"/>
-                        </svg>
-                    </div>
-                </button>
-            </section>
+        <!-- header -->
+    <header>
+        <img src="static/image/ljs.png" alt="" class="logo">
+        <ul class="menu">
+            <a class="project" href="#about">About Us</a>
+            <li>|</li>
+            <a class="project" href="#project-info" target="_blank">Project Info</a>
+        </ul>
+       
+        </div>
+    </header>
 
-            <!-- Main Content -->
-            <div class="content-box">
-                <!-- About Us Section -->
-                <section id="about" class="about-us">
-                    <h2><i class="fas fa-users"></i> About Us</h2>
-                    <p>LJS Game Center is a passionate community of gamers and developers dedicated to bringing you the best gaming experience. Our team works tirelessly to curate and deliver top-notch games for all types of players.</p>
-                </section>
+    <!-- slider -->
 
-                <!-- About This Web Section -->
-                <section class="about-web">
-                    <h2><i class="fas fa-globe"></i> About This Web</h2>
-                    <p>LJS Game Center is your one-stop platform for discovering, downloading, and enjoying a wide variety of games. From action-packed adventures to mind-bending puzzles, we've got something for everyone!</p>
-                    <ul>
-                        <li><i class="fas fa-search"></i> Easy game search and discovery</li>
-                        <li><i class="fas fa-download"></i> Secure downloads</li>
-                        <li><i class="fas fa-comments"></i> Community features</li>
-                        <li><i class="fas fa-sync-alt"></i> Regular updates and new releases</li>
-                    </ul>
-                </section>
-
-                <!-- Visitor Stats Section -->
-                <section class="visitor-stats">
-                    <h2 class="text1"><i class="fas fa-chart-bar"></i> Community Stats</h2>
-                    <div class="stat-container">
-                        <div class="stat-item">
-                            <i class="fas fa-users"></i>
-                            <h3>Total Visitors</h3>
-                            <p class="stat-number">{{ visitor_count }}</p>
-                        </div>
-                        <div class="stat-item">
-                            <i class="fas fa-user-plus"></i>
-                            <h3>Registered Users</h3>
-                            <p class="stat-number">{{ user_count }}</p>
-                        </div>
-                        <div class="stat-item">
-                            <i class="fas fa-download"></i>
-                            <h3>Games Downloaded</h3>
-                            <p class="stat-number">{{ downloads }}</p>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Call to Action -->
-                <section class="cta">
-                    <a href="{{ url_for('register') }}" class="button">
-                        <i class="fas fa-user-plus"></i> Sign Up Now
-                    </a>
-                    <a href="{{ url_for('login') }}" class="button">
-                        <i class="fas fa-sign-in-alt"></i> Login
-                    </a>
-                </section>
+    <div class="slider">
+        <!-- list Items -->
+        <div class="list">
+            <div class="item active">
+                <img src="static/image/img1.png">
+                <div class="content">
+                    <p>Genre: Action, FPS</p>
+                    <h2>UltraKill</h2>
+                    <p>
+                        Ultrakill adalah game FPS yang menggabungkan elemen aksi cepat dan gameplay yang sangat responsif. Dalam permainan ini, pemain mengendalikan V1, robot yang mencari darah untuk bertahan hidup di dunia pasca-apokaliptik di mana umat manusia telah punah. Permainan ini terkenal dengan kecepatan tinggi, mekanik unik seperti pengisian senjata, dan sistem peringkat gaya yang mirip dengan Devil May Cry. Ultrakill menonjolkan kombinasi aksi brutal dan eksplorasi yang mendalam, dengan berbagai level yang penuh tantangan dan bos yang sulit.
+                    </p>
+                </div>
+            </div>
+            <div class="item">
+                <img src="static/image/img2.jpg">
+                <div class="content">
+                    <p>Genre: FPS</p>
+                    <h2> CS:GO</h2>
+                    <p>
+                        CS:GO adalah game FPS taktis yang menjadi salah satu permainan kompetitif paling populer di dunia. Pemain dibagi menjadi dua tim, teroris dan kontra-teroris, dan bertarung dalam berbagai mode permainan seperti bomb defusal dan hostage rescue. CS:GO menawarkan gameplay berbasis tim yang mendalam, dengan fokus pada strategi, komunikasi, dan keterampilan individu. Game ini juga memiliki ekosistem esports yang besar dengan turnamen internasional.
+                    </p>
+                </div>
+            </div>
+            <div class="item">
+                <img src="static/image/img3.jpg">
+                <div class="content">
+                    <p>Genre: Horror, Adventure, Action</p>
+                    <h2>A Quiet Place</h2>
+                    <p>
+                        A Quiet Place adalah game survival horror yang menuntut pemain untuk bergerak diam-diam untuk menghindari makhluk mematikan yang tertarik pada suara.
+                    </p>
+                </div>
+            </div>
+            <div class="item">
+                <img src="static/image/img4.jpg">
+                <div class="content">
+                    <p>Genre: Survival</p>
+                    <h2>Frostpunk </h2>
+                    <p>
+                        Frostpunk 2 adalah sekuel dari game survival city-building yang sukses, Frostpunk. Dalam game ini, pemain harus membangun dan mengelola kota di lingkungan yang ekstrem dan dingin sambil mempertimbangkan moralitas keputusan mereka.
+                    </p>
+                </div>
+            </div>
+            <div class="item">
+                <img src="static/image/img5.jpg">
+                <div class="content">
+                    <p>Genre: Action RPG, Survival Horror</p>
+                    <h2>DeadIsland</h2>
+                    <p>
+                        Dead Island adalah sekuel dari game zombie action RPG yang terkenal dengan elemen co-op multiplayer. Game ini mengatur pemain di Los Angeles yang terinfeksi zombie.
+                    </p>
+                </div>
             </div>
         </div>
-        <div class="page-transition"></div>
-    </body>
-    <script>
-        const aboutSection = document.getElementById('about');
-        const button = document.querySelector('.button');
+        <!-- button arrows -->
+        <div>
+            <button id="prev"></button>
+            <button id="next"></button>
+        </div>
+        <button class="button"><a class="explore" href="/login">Explore Now</a></button>
+        <!-- thumbnail -->
+        <div class="thumbnail">
+            <div class="item active">
+                <img src="static/image/img1.png">
+                <div class="content">
+                  
+                </div>
+            </div>
+            <div class="item">
+                <img src="static/image/img2.jpg">
+                <div class="content">
+               
+                </div>
+            </div>
+            <div class="item">
+                <img src="static/image/img3.jpg">
+                <div class="content">
+                    
+                </div>
+            </div>
+            <div class="item">
+                <img src="static/image/img4.jpg">
+                <div class="content">
+                  
+                </div>
+            </div>
+            <div class="item">
+                <img src="static/image/img5.jpg">
+                <div class="content">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <section id="about" style="background-color: #000; color: #eee; padding: 50px 20px; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        <div class="about-content">
+            <h2>About Us | LJS Web Game Store</h2>
+            <p>
+                Selamat datang di LJS Game Center - destinasi terbaik bagi para gamer untuk menemukan dan mengunduh berbagai pilihan game seru dan menarik! Kami menyediakan koleksi game yang luas, dari permainan kasual hingga tantangan hardcore, untuk semua platform favoritmu.
+            </p>
+        </div>
+        <a class="project" id="back-to-top" style="background: none; color: #eee; padding: 10px 20px; cursor: pointer;">Back to Top</a>
+        <a class="project" href="#project-info" target="_blank">Project Info</a>
+    </section>
     
-        button.addEventListener('click', () => {
-            if (aboutSection) {
-                aboutSection.scrollIntoView({ behavior: 'smooth' });
-            } else {
-                console.error('The "about" section was not found.');
-            }
+    <section id="project-info" style="background-color: #111; color: #eee; padding: 50px 20px; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        <h2>Project Info</h2>
+        <a id="back-to-top-project" style=" background: none; color: #eee; padding: 10px 20px; cursor: pointer;">Back to Top</a>
+        <div class="tools">
+            <div class="tool">
+                <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub" class="tool-logo">
+                <h3>GitHub</h3>
+                <p>Platform untuk kolaborasi pengembangan brperangkat lunak dan version control berbasis Git.</p>
+            </div>
+            <div class="tool">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a8/Microsoft_Azure_Logo.svg" alt="Azure" class="tool-logo">
+                <h3>Azure</h3>
+                <p>Layanan cloud computing dari Microsoft untuk hosting, penyimpanan data, dan pengembangan aplikasi.</p>
+            </div>
+            <div class="tool">
+                <img src="https://cdn-icons-png.flaticon.com/512/1216/1216733.png" alt="HTML5" class="tool-logo">
+                <h3>HTML5</h3>
+                <p>Bahasa markup untuk struktur halaman web modern dengan fitur multimedia dan responsif.</p>
+            </div>
+            <div class="tool">
+                <img src="https://cdn-icons-png.flaticon.com/512/5968/5968350.png" alt="Python" class="tool-logo">
+                <h3>Python</h3>
+                <p>Bahasa pemrograman yang kuat dan serbaguna untuk backend dan pengembangan aplikasi web.</p>
+            </div>
+            <div class="tool">
+                <img src="https://cdn-icons-png.flaticon.com/512/732/732190.png" alt="CSS" class="tool-logo">
+                <h3>CSS</h3>
+                <p>Bahasa styling untuk desain tampilan halaman web yang menarik dan responsif.</p>
+            </div>
+            <div class="tool">
+                <img src="https://cdn-icons-png.flaticon.com/512/5968/5968292.png" alt="JavaScript" class="tool-logo">
+                <h3>JavaScript</h3>
+                <p>Bahasa pemrograman untuk interaktivitas dan fitur dinamis di halaman web.</p>
+            </div>
+            <div class="tool">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/3/38/SQLite370.svg" alt="SQLite" class="tool-logo">
+                <h3>SQLite</h3>
+                <p>Database ringan dan sederhana untuk pengelolaan data yang cepat dan efisien.</p>
+            </div>
+        </div>
+    </section>
+    
+    
+
+    <script src="static/js/app.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Scroll ke elemen target secara halus
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+    
+                    const targetID = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetID);
+    
+                    if (targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+    
+            // Tombol "Back to Top"
+            const backToTopButton = document.getElementById('back-to-top');
+            backToTopButton.addEventListener('click', function () {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+            const backToTopProjectButton = document.getElementById('back-to-top-project');
+        backToTopProjectButton.addEventListener('click', function () {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
-        document.addEventListener('DOMContentLoaded', () => {
-    const transitionElement = document.querySelector('.page-transition');
-
-    function startTransition(url) {
-        transitionElement.classList.add('active');
-        transitionElement.classList.add('slide-in');
+        });
         
-        setTimeout(() => {
-            window.location.href = url;
-        }, 500);
-    }
-
-    // Intercept all internal links
-    document.body.addEventListener('click', (e) => {
-        const link = e.target.closest('a');
-        if (link && link.getAttribute('href').startsWith('/')) {
-            e.preventDefault();
-            startTransition(link.href);
-        }
-    });
-
-    // Handle back button
-    window.addEventListener('pageshow', (event) => {
-        if (event.persisted) {
-            transitionElement.classList.add('active');
-            transitionElement.classList.add('slide-out');
-            
-            setTimeout(() => {
-                transitionElement.classList.remove('active', 'slide-out');
-            }, 500);
-        }
-    });
-});
-
     </script>
-    </html>
+    
+    
+</body>
+</html>
