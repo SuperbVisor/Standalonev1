@@ -26,7 +26,7 @@ flow = Flow.from_client_config(
             "token_uri": os.getenv('GOOGLE_TOKEN_URI', 'https://oauth2.googleapis.com/token'),
             "auth_provider_x509_cert_url": os.getenv('GOOGLE_AUTH_PROVIDER_X509_CERT_URL', 'https://www.googleapis.com/oauth2/v3/certs'),
             "client_secret": "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",
-            "redirect_uris":'http://127.0.0.1:5000/auth/google/callback'
+            "redirect_uris":'https://gamestorefree-edczbmc0e5hdb9en.southeastasia-01.azurewebsites.net/auth/google/callback'
         }
     },
     scopes=[
@@ -34,7 +34,7 @@ flow = Flow.from_client_config(
     "https://www.googleapis.com/auth/userinfo.email",
     "https://www.googleapis.com/auth/userinfo.profile"
 ],
-    redirect_uri="http://127.0.0.1:5000/auth/google/callback"
+    redirect_uri="https://gamestorefree-edczbmc0e5hdb9en.southeastasia-01.azurewebsites.net/auth/google/callback"
 
 )
 
