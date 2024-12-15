@@ -26,11 +26,11 @@ flow = Flow.from_client_config(
             "token_uri": os.getenv('GOOGLE_TOKEN_URI', 'https://oauth2.googleapis.com/token'),
             "auth_provider_x509_cert_url": os.getenv('GOOGLE_AUTH_PROVIDER_X509_CERT_URL', 'https://www.googleapis.com/oauth2/v3/certs'),
             "client_secret": GOOGLE_CLIENT_SECRET,
-            "redirect_uris":'https://gamestorefree-edczbmc0e5hdb9en.southeastasia-01.azurewebsites.net/login/google/callback'
+            "redirect_uris":'http://127.0.0.1:5000/auth/google/callback'
         }
     },
     scopes=["openid", "email", "profile"],
-    redirect_uri=os.getenv('GOOGLE_REDIRECT_URI', 'https://gamestorefree-edczbmc0e5hdb9en.southeastasia-01.azurewebsites.net/login/google/callback')
+    redirect_uri=os.getenv('GOOGLE_REDIRECT_URI', 'http://127.0.0.1:5000/auth/google/callback')
 )
 
 app = Flask(__name__)
@@ -130,7 +130,7 @@ def google_login():
     session['state'] = state
     return redirect(authorization_url)
 
-@app.route('/login/google/callback')
+@app.route('/auth/google/callback')
 def callback():
     if not session.get('state') == request.args.get('state'):
         flash("Invalid state parameter. Login failed.", "error")
