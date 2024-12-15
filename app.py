@@ -131,6 +131,7 @@ def google_login():
     return redirect(authorization_url)
 
 @app.route('/auth/google/callback')
+@app.route('/auth/google/callback')
 def callback():
     if not session.get('state') == request.args.get('state'):
         flash("Invalid state parameter. Login failed.", "error")
