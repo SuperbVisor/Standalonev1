@@ -15,7 +15,7 @@ import requests
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
 GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configuration"
-
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 # Configure Google Sign-In flow
 flow = Flow.from_client_config(
     {
@@ -25,12 +25,17 @@ flow = Flow.from_client_config(
             "auth_uri": os.getenv('GOOGLE_AUTH_URI', 'https://accounts.google.com/o/oauth2/auth'),
             "token_uri": os.getenv('GOOGLE_TOKEN_URI', 'https://oauth2.googleapis.com/token'),
             "auth_provider_x509_cert_url": os.getenv('GOOGLE_AUTH_PROVIDER_X509_CERT_URL', 'https://www.googleapis.com/oauth2/v3/certs'),
-            "client_secret": GOOGLE_CLIENT_SECRET,
+            "client_secret": "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",
             "redirect_uris":'http://127.0.0.1:5000/auth/google/callback'
         }
     },
-    scopes=["openid", "email", "profile"],
-    redirect_uri=os.getenv('GOOGLE_REDIRECT_URI', 'http://127.0.0.1:5000/auth/google/callback')
+    scopes=[
+    "openid",
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile"
+],
+    redirect_uri="http://127.0.0.1:5000/auth/google/callback"
+
 )
 
 app = Flask(__name__)
