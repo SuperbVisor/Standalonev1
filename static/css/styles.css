@@ -384,63 +384,66 @@ nav ul li a.logout:hover {
     max-width: 400px;
     height: auto;
 }
-.profile-box {
+.profile-bubble {
     position: fixed;
     bottom: 20px;
     right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%; /* Membuat elemen induk berbentuk bundar */
     backdrop-filter: blur(10px);
-    border-radius: 5px;
-    padding: 15px;
-    max-width: 250px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden; /* Memastikan elemen di dalam tetap dalam bentuk bundar */
 }
 
-.profile-box:hover {
-    transform: scale(1.1);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+.profile-bubble:hover {
+    transform: scale(1.2); /* Zoom in */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Tambahkan efek shadow */
 }
 
-@keyframes fadeIn {
-    0% {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.profile-bubble::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
 }
 
-.profile-box {
-    animation: fadeIn 1s ease;
+.profile-bubble:hover::after {
+    opacity: 1;
 }
 
-.profile-box h4 {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    color: whitesmoke;
-}
-
-.profile-box p {
-    margin: 5px 0;
-    font-size: 0.9em;
-    color: whitesmoke;
-}
-
-.profile-picture {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    overflow: hidden;
-    margin: 0 auto 10px;
-}
-
-.profile-picture img {
+.profile-bubble img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
+
+.profile-box {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    background-color: #FFF8DC;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    display: none;
+    transition: all 0.3s ease;
+}
+
+.profile-box.visible {
+    display: block;
+}
+
+
+/*sso*/
 .sso-container {
     margin-top: 20px;
     text-align: center;

@@ -120,19 +120,43 @@
     {% else %}
         <h1 class="text2">No games found. Try searching for something else!</h1>
     {% endif %}
-    <div class="profile-box">
-      <div class="profile-picture">
-          {% if user.is_admin %}
-              <img src="{{ url_for('static', filename='uploads/adminpp.jpg') }}" alt="Admin Profile Picture">
-          {% elif user.profile_pic %}
-              <img src="{{ url_for('static', filename='uploads/pp/' + user.profile_pic) }}" alt="Profile Picture">
-          {% else %}
-              <img src="{{ url_for('static', filename='uploads/pp/default.png') }}" alt="Default Profile Picture">
-          {% endif %}
-      </div>
-      <h4>Profile</h4>
-      <p><strong>Email:</strong> {{ user.email }}</p>
-      <p><strong>Username:</strong> {{ user.username }}</p>
-      <p><strong>Bio:</strong> {{ user.bio if user.bio else 'No bio available' }}</p>
-    </div>
+    
+<div class="profile-bubble" id="profileBubble">
+  {% if user.is_admin %}
+      <img src="{{ url_for('static', filename='uploads/adminpp.jpg') }}" alt="Admin Profile Picture">
+  {% elif user.profile_pic %}
+      <img src="{{ url_for('static', filename='uploads/pp/' + user.profile_pic) }}" alt="Profile Picture">
+  {% else %}
+      <img src="{{ url_for('static', filename='uploads/pp/default.png') }}" alt="Default Profile Picture">
+  {% endif %}
+</div>
+
+<div class="profile-box" id="profileBox">
+  <h4>Profile</h4>
+  <p><strong>Email:</strong> {{ user.email }}</p>
+  <p><strong>Username:</strong> {{ user.username }}</p>
+  <p><strong>Bio:</strong> {{ user.bio if user.bio else 'No bio available' }}</p>
+</div>
+
+<<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const profileBubble = document.getElementById('profileBubble');
+      const profileBox = document.getElementById('profileBox');
+
+      profileBubble.addEventListener('click', function() {
+          profileBox.classList.toggle('visible');
+      });
+
+      profileBubble.addEventListener('mousemove', function(e) {
+          const rect = profileBubble.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          
+          profileBubble.style.setProperty('--mouse-x', `${x}px`);
+          profileBubble.style.setProperty('--mouse-y', `${y}px`);
+      });
+  });
+</script>
+
+
 {% endblock %}
